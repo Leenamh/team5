@@ -35,7 +35,7 @@ struct heart: View {
                 Spacer().frame(height: 50)
                 
                 //  Question
-                Text("How likely are you going to enjoy Blue?")
+                Text("Is this decision important for your future?")
                     .font(.title2)
                     .fontWeight(.medium)
                     .foregroundColor(Color(red: 1.0, green: 116/255, blue: 114/255)) // 🎨 FF7472
