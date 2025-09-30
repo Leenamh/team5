@@ -43,7 +43,7 @@ struct RandomeHome: View {
                            
                         }
                         .font(.system(size: 18, weight: .medium, design: .rounded))
-                        .foregroundColor(Color(red: 1.0, green: 116/255, blue: 114/255))
+                        .foregroundColor(Color("red"))
                     }
                     
                     
@@ -51,7 +51,7 @@ struct RandomeHome: View {
                         Button("Add") {
                             
                         }.font(.system(size: 18, weight: .medium, design: .rounded))
-                            .foregroundColor(Color(red: 1.0, green: 116/255, blue: 114/255))
+                            .foregroundColor(Color("red"))
                     }}}
                     }
                 }

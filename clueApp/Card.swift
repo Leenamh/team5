@@ -47,11 +47,8 @@ struct DecisionPage: View {
                         print("Next button tapped")
                     }) {
                         Text("Next")
-                            .font(.subheadline)
-                            .foregroundColor(Color(red: 0.996, green: 0.365, blue: 0.357))
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 8)
-                            .cornerRadius(12)
+                            .font(.system(size: 18, weight: .medium, design: .rounded))
+                                .foregroundColor(Color("red"))
                     }
                     .padding(.top, -105)
                 }
@@ -85,7 +82,7 @@ struct DecisionPage: View {
                 .padding(.bottom, -30)
             }
             .padding(.top, 10)
-        }
+        }.navigationBarBackButtonHidden(true) // hides default back button
     }
 }
 // MARK: - CurvedCard View (زاوية واحدة دائرية)

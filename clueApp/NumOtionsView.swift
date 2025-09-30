@@ -5,58 +5,25 @@
 //  Created by Hissah Alohali on 08/04/1447 AH.
 //
 
-
-//
-//  SwiftUIView.swift
-//  page1
-//
-//  Created by Hissah Alohali on 08/04/1447 AH.
-//
-
 import SwiftUI
 
 struct NumOtionsView: View {
     @State private var selectedOption: Int? = nil
-    let clueRed = UIColor(named: "red")!
-    let cluePeach = UIColor(named: "peach")!
-    let cluePink = UIColor(named: "pink")!
-    let clueYellow = UIColor(named: "yellow")!
-    let clueLightYellow = UIColor(named: "lightYellow")!
+    @State private var goToCard = false   // trigger for Next navigation
+    @State private var goToHome = false   // trigger for Back navigation
+
 
     var body: some View {
-        ZStack{
-            Color(clueLightYellow).ignoresSafeArea()
-            VStack(spacing: 40){
-                
-                
-                HStack{
-                    Button("Back") {
-                        // Handle back action
-                    }
-                    .foregroundColor(Color(clueRed))
-                    .font(.system(size: 18, weight: .medium, design: .rounded))
-                    
-                    Spacer()
-                    
-                    Button("Next") {
-                        // Handle next action
-                    }
-                    .foregroundColor(Color(clueRed))
-                    .font(.system(size: 18, weight: .medium, design: .rounded))
-                }
-                //.padding(.horizontal)
-                .padding(.top, 5)
-                .frame(maxWidth:.infinity, maxHeight: 1, alignment: .top)
-                
-                //Spacer()
-                .padding(.bottom, 50)
+        ZStack {
+            Color("BG").ignoresSafeArea()
+
+            VStack(spacing: 40) {
                 Text("How many options\ndo you have?")
                     .font(.system(size: 30, weight: .medium, design: .rounded))
                     .fontWeight(.medium)
-                    .foregroundColor(Color(clueRed))
+                    .foregroundColor(Color("red"))
                     .multilineTextAlignment(.center)
-                
-                
+
                 HStack(spacing: 24) {
                     ForEach(1...4, id: \.self) { number in
                         Button(action: {
@@ -79,21 +46,49 @@ struct NumOtionsView: View {
                 Spacer()
             }
             .padding()
-            
         }
-        
-    }
-    private func circleColor(for number: Int) -> Color {
-            switch number {
-            case 1: return Color(clueRed)
-            case 2: return Color(cluePeach)
-            case 3: return Color(cluePink)
-            case 4: return Color(clueYellow)
-            default: return Color.gray
+        .navigationBarBackButtonHidden(true) // hides default back button
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button("Back") {
+                    goToHome = true
+                }
+                .font(.system(size: 18, weight: .medium, design: .rounded))
+                .foregroundColor(Color("red"))
+            }
+
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button("Next") {
+                    goToCard = true
+                }
+                .font(.system(size: 18, weight: .medium, design: .rounded))
+                .foregroundColor(Color("red"))
             }
         }
-    
+        // Hidden NavigationLink to Card
+        .background(
+            NavigationLink(destination: Card(), isActive: $goToCard) { EmptyView() }
+                .hidden()
+        )
+        .background(
+            NavigationLink(destination: Home(), isActive: $goToHome) { EmptyView() }
+                .hidden()
+        )
+    }
+
+    private func circleColor(for number: Int) -> Color {
+        switch number {
+        case 1: return Color("red")
+        case 2: return Color("peach")
+        case 3: return Color("pink")
+        case 4: return Color("yellow")
+        default: return Color.gray
+        }
+    }
 }
+
 #Preview {
-    NumOtionsView()
+    NavigationStack {
+        NumOtionsView()
+    }
 }

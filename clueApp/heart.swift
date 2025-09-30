@@ -3,13 +3,6 @@
 //  clueApp
 //
 //  Created by Wed Ahmed Alasiri on 08/04/1447 AH.
-//
-
-
-//
-//  heart.swift
-//  wed1
-//
 //  Created by Wed Ahmed Alasiri on 08/04/1447 AH.
 //
 
