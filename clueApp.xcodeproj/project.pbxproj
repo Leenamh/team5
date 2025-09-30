@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		1DBF8E652E8ACB2B0057789E /* clueApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = clueApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1DBF8E652E8ACB2B0057789E /* clueApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = clueApp.app; path = "/Users/reemaalsaleh/Documents/team5/build/Debug-iphoneos/clueApp.app"; sourceTree = "<absolute>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -33,16 +33,7 @@
 			isa = PBXGroup;
 			children = (
 				1DBF8E672E8ACB2B0057789E /* clueApp */,
-				1DBF8E662E8ACB2B0057789E /* Products */,
 			);
-			sourceTree = "<group>";
-		};
-		1DBF8E662E8ACB2B0057789E /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				1DBF8E652E8ACB2B0057789E /* clueApp.app */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -95,7 +86,7 @@
 			mainGroup = 1DBF8E5C2E8ACB2B0057789E;
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
-			productRefGroup = 1DBF8E662E8ACB2B0057789E /* Products */;
+			productRefGroup = 1DBF8E5C2E8ACB2B0057789E;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
