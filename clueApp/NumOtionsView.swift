@@ -44,6 +44,7 @@ struct NumOtionsView: View {
                     }
                 }
                 Spacer()
+                condensedCards()
             }
             .padding()
         }
@@ -83,6 +84,50 @@ struct NumOtionsView: View {
         case 3: return Color("pink")
         case 4: return Color("yellow")
         default: return Color.gray
+        }
+    }
+}
+//cards
+struct oneCard: View {
+    var color: Color
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+                OpenedCardShape()
+                    .fill(color)
+                    .frame(height:100)
+
+                    .shadow(color: color.opacity(0.3), radius: 6, x: 0, y: 4)
+        }
+        .padding(.horizontal, -35)
+        }
+    }
+struct CardShape: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        
+        path.move(to: CGPoint(x: 0, y: rect.height))
+        path.addLine(to: CGPoint(x: 0, y: 60))
+        path.addQuadCurve(to: CGPoint(x: 80, y: 0), control: CGPoint(x: 0, y: 0))
+        path.addLine(to: CGPoint(x: rect.width - 100, y: 0))
+        path.addQuadCurve(to: CGPoint(x: rect.width, y: -100), control: CGPoint(x: rect.width, y: 0))
+        path.addLine(to: CGPoint(x: rect.width, y: rect.height))
+        path.closeSubpath()
+        
+        return path
+    }
+}
+struct condensedCards: View{
+    var body: some View {
+        VStack {
+            Spacer() // pushes cards down
+            VStack(spacing: -35) {
+                oneCard(color: Color("red"))
+                oneCard(color: Color("peach"))
+                oneCard(color: Color("pink"))
+                oneCard(color: Color("yellow"))
+                oneCard(color: Color("lightYellow"))            }
+            .padding(.horizontal, )
         }
     }
 }

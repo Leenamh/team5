@@ -26,7 +26,7 @@ struct OptionTitleView: View {
                     Button("Back") {
                         // Handle back action
                     }
-                    .foregroundColor(Color(clueRed))
+                    .foregroundColor(Color("red"))
                     .font(.system(size: 18, weight: .medium, design: .rounded))
                     
                     Spacer()
@@ -34,7 +34,7 @@ struct OptionTitleView: View {
                     Button("Next") {
                         // Handle next action
                     }
-                    .foregroundColor(Color(clueRed))
+                    .foregroundColor(Color("red"))
                     .font(.system(size: 18, weight: .medium, design: .rounded))
                 }
                 //.padding(.horizontal)
@@ -46,21 +46,23 @@ struct OptionTitleView: View {
                 Text("Option \(optionNumber)")
                     .font(.system(size: 30, weight: .medium, design: .rounded))
                     .fontWeight(.medium)
-                    .foregroundColor(Color(clueRed))
+                    .foregroundColor(Color("red"))
                     .multilineTextAlignment(.center)
                 
                 TextField("Option title", text: $optionTitle)
                     .padding(.horizontal, 20)
-                            .padding(.vertical, 12)
-                            .background(Color.white.opacity(0.6)) // very transparent
-                            .clipShape(Capsule()) // makes it elliptical
-                            .foregroundColor(.white) // text color
-                            .overlay(
-                                Capsule().stroke(Color.white.opacity(0.5), lineWidth: 1))
-                            .frame(width:282, height:36)
+                    .padding(.vertical, 12)
+                    .background(Color.white.opacity(0.6)) // very transparent
+                    .clipShape(Capsule()) // makes it elliptical
+                    .foregroundColor(Color("red")) // text color
+                    .overlay(
+                        Capsule().stroke(Color.white.opacity(0.5), lineWidth: 1))
+                    .frame(width:282, height:36)
                 
                 
-                Spacer()}
+                Spacer()
+                condensedCards()
+            }
             .padding()
         }
     }
