@@ -1,16 +1,10 @@
-//
-//  Home.swift
-//  clueApp
-//
-//  Created by leena Almusharraf
-//
-
 import SwiftUI
 
 struct Home: View {
     @State private var offsetX: CGFloat = 0.0 // track circle movement
-    @State private var goToNumOptions = false // track navigation
-    
+    @State private var goToNumOptions = false // navigate Wisely
+    @State private var goToRandom = false     // navigate Randomly
+
     var body: some View {
         NavigationStack {
             ZStack {
@@ -52,7 +46,7 @@ struct Home: View {
                                 .shadow(color: .pink.opacity(0.3), radius: 4, x: 1, y: 1)
                                 .frame(maxWidth: .infinity)
                             
-                            Text("Randomly")
+                            Text(" Randomly")
                                 .font(.system(size: 16, weight: .bold, design: .rounded))
                                 .foregroundColor(Color.white.opacity(0.4))
                                 .shadow(color: .white.opacity(0.8), radius: 2)
@@ -80,8 +74,11 @@ struct Home: View {
                                     }
                                     .onEnded { _ in
                                         if offsetX < -80 {
-                                            // go left → navigate
+                                            // go left → Wisely
                                             goToNumOptions = true
+                                        } else if offsetX > 80 {
+                                            // go right → Randomly
+                                            goToRandom = true
                                         }
                                         withAnimation {
                                             offsetX = 0
@@ -91,11 +88,15 @@ struct Home: View {
                     }
                     .padding(.top, -10)
                 }
-                
-                // Navigation link (hidden but triggered by state)
-                NavigationLink("NumOtionsView", destination: NumOtionsView(), isActive: $goToNumOptions)
-                    .hidden()
-            }.navigationBarBackButtonHidden(true) // hides default back button
+            }
+            // ✅ navigation destinations
+            .navigationDestination(isPresented: $goToNumOptions) {
+                NumOtionsView()
+            }
+            .navigationDestination(isPresented: $goToRandom) {
+                ShakePage1()
+            }
+            .navigationBarBackButtonHidden(true)
         }
     }
 }

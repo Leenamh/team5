@@ -12,7 +12,6 @@ struct NumOtionsView: View {
     @State private var goToCard = false   // trigger for Next navigation
     @State private var goToHome = false   // trigger for Back navigation
 
-
     var body: some View {
         ZStack {
             Color("BG").ignoresSafeArea()
@@ -66,15 +65,13 @@ struct NumOtionsView: View {
                 .foregroundColor(Color("red"))
             }
         }
-        // Hidden NavigationLink to Card
-        .background(
-            NavigationLink(destination: Card(), isActive: $goToCard) { EmptyView() }
-                .hidden()
-        )
-        .background(
-            NavigationLink(destination: Home(), isActive: $goToHome) { EmptyView() }
-                .hidden()
-        )
+        // ✅ Modern way: navigationDestination instead of deprecated NavigationLink
+        .navigationDestination(isPresented: $goToCard) {
+            Card()
+        }
+        .navigationDestination(isPresented: $goToHome) {
+            Home()
+        }
     }
 
     private func circleColor(for number: Int) -> Color {
@@ -87,21 +84,22 @@ struct NumOtionsView: View {
         }
     }
 }
-//cards
+
+// cards
 struct oneCard: View {
     var color: Color
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-                OpenedCardShape()
-                    .fill(color)
-                    .frame(height:100)
-
-                    .shadow(color: color.opacity(0.3), radius: 6, x: 0, y: 4)
+            OpenedCardShape()
+                .fill(color)
+                .frame(height: 100)
+                .shadow(color: color.opacity(0.3), radius: 6, x: 0, y: 4)
         }
         .padding(.horizontal, -35)
-        }
     }
+}
+
 struct CardShape: Shape {
     func path(in rect: CGRect) -> Path {
         var path = Path()
@@ -117,7 +115,8 @@ struct CardShape: Shape {
         return path
     }
 }
-struct condensedCards: View{
+
+struct condensedCards: View {
     var body: some View {
         VStack {
             Spacer() // pushes cards down
@@ -126,8 +125,8 @@ struct condensedCards: View{
                 oneCard(color: Color("peach"))
                 oneCard(color: Color("pink"))
                 oneCard(color: Color("yellow"))
-                oneCard(color: Color("lightYellow"))            }
-            .padding(.horizontal, )
+                oneCard(color: Color("lightYellow"))
+            }
         }
     }
 }

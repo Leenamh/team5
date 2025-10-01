@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		1DBF8E652E8ACB2B0057789E /* clueApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = clueApp.app; path = "/Users/hissahalohali/Desktop/team5/build/Debug-iphoneos/clueApp.app"; sourceTree = "<absolute>"; };
+		1D6BB8FA2E8DB4D200578739 /* clueApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = clueApp.app; path = "/Users/leena/Desktop/team5/build/Debug-iphoneos/clueApp.app"; sourceTree = "<absolute>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -58,7 +58,7 @@
 			packageProductDependencies = (
 			);
 			productName = clueApp;
-			productReference = 1DBF8E652E8ACB2B0057789E /* clueApp.app */;
+			productReference = 1D6BB8FA2E8DB4D200578739 /* clueApp.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
