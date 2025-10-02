@@ -10,7 +10,9 @@ import SwiftUI
 // MARK: - Main ContentView
 struct Card: View {
     var body: some View {
-        DecisionPage()
+        NavigationStack {
+                    DecisionPage()
+                }
     }
 }
 
@@ -22,17 +24,17 @@ struct Card: View {
 struct DecisionPage: View {
     @State private var expandedCard: String? = nil
     @State private var cardTexts: [String: String] = [:] // store user input for each card
-
+    @State private var goToNextOption = false
+    var optionNumber = 1;
     var body: some View {
         ZStack {
             // Background
-            Color(red: 1.0, green: 0.925, blue: 0.655)
-                .ignoresSafeArea()
+            Color("BG").ignoresSafeArea()
             
             VStack {
                 // Top fixed section (Option 1 + Next button)
                 HStack {
-                    Text("Option 1")
+                    Text("Option \(optionNumber)")
                         .font(.headline)
                         .foregroundColor(.white)
                         .padding(.vertical, 40)
@@ -40,16 +42,10 @@ struct DecisionPage: View {
                         .background(Color(red: 1.0, green: 0.831, blue: 0.541))
                         .cornerRadius(28)
                         .padding(.leading, -35)
-                        .offset(x: 4, y: -100)
+                        .offset(x: 4, y: -130)
                     
                     Spacer()
                     
-                    Button(action: { print("Next button tapped") }) {
-                        Text("Next")
-                            .font(.system(size: 18, weight: .medium, design: .rounded))
-                            .foregroundColor(Color("red"))
-                    }
-                    .padding(.top, -105)
                 }
                 .padding()
                 
@@ -78,6 +74,17 @@ struct DecisionPage: View {
             .padding(.top, 10)
         }
         .navigationBarBackButtonHidden(true)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button("Next") {
+                    goToNextOption
+                }
+                .font(.system(size: 18, weight: .medium, design: .rounded))
+                .foregroundColor(Color("red"))
+            }
+        } .navigationDestination(isPresented: $goToNextOption) {
+            Card()
+        }
     }
     
     // MARK: - Function to get card color
