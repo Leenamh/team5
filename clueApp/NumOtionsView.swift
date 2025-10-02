@@ -1,109 +1,7 @@
-
 import SwiftUI
 
-final class OptionsViewModel: ObservableObject {
-    @Published var numberOfOptions: Int = 1 {
-        didSet { ensureTitlesSize() }
-    }
-    @Published var titles: [String] = []
-    @Published var currentIndex: Int = 0
-
-    private let userDefaultsKey = "com.example.optionsPayload"
-
-    init() {
-        load()
-    }
-
-    private func ensureTitlesSize() {
-        if titles.count < numberOfOptions {
-            titles += Array(repeating: "", count: numberOfOptions - titles.count)
-        } else if titles.count > numberOfOptions {
-            titles = Array(titles.prefix(numberOfOptions))
-        }
-        if currentIndex >= numberOfOptions {
-            currentIndex = max(0, numberOfOptions - 1)
-        }
-    }
-    
-
-
-    func setNumberOfOptions(_ n: Int) {
-        numberOfOptions = max(1, min(n, 10))
-        ensureTitlesSize()
-        save()
-    }
-
-    var currentOptionNumber: Int { currentIndex + 1 }
-
-    func titleForCurrent() -> String {
-        guard currentIndex < titles.count else { return "" }
-        return titles[currentIndex]
-    }
-
-    func updateCurrentTitle(_ title: String) {
-        ensureTitlesSize()
-        titles[currentIndex] = title
-        save()
-    }
-
-    func goToNextOption() -> Bool {
-        if currentIndex < numberOfOptions - 1 {
-            currentIndex += 1
-            save()
-            return true
-        }
-        return false
-    }
-
-    func goToPreviousOption() -> Bool {
-        if currentIndex > 0 {
-            currentIndex -= 1
-            save()
-            return true
-        }
-        return false
-    }
-
-    var isLastOption: Bool {
-        currentIndex == numberOfOptions - 1
-    }
-
-    struct Persisted: Codable {
-        var numberOfOptions: Int
-        var titles: [String]
-    }
-
-    private func save() {
-        let p = Persisted(numberOfOptions: numberOfOptions, titles: titles)
-        if let data = try? JSONEncoder().encode(p) {
-            UserDefaults.standard.set(data, forKey: userDefaultsKey)
-        }
-    }
-
-    private func load() {
-        guard let data = UserDefaults.standard.data(forKey: userDefaultsKey),
-              let p = try? JSONDecoder().decode(Persisted.self, from: data) else {
-            numberOfOptions = 1
-            titles = [""]
-            currentIndex = 0
-            return
-        }
-        numberOfOptions = max(1, p.numberOfOptions)
-        titles = p.titles
-        ensureTitlesSize()
-        currentIndex = 0
-    }
-
-    func reset() {
-        numberOfOptions = 1
-        titles = [""]
-        currentIndex = 0
-        save()
-    }
-}
-
 struct NumOtionsView: View {
-    @StateObject private var viewModel = OptionsViewModel()
+    @EnvironmentObject var viewModel: OptionsViewModel
     @State private var selectedOption: Int? = nil
     @State private var goToOptionTitles = false
     @State private var goToHome = false
@@ -124,6 +22,15 @@ struct NumOtionsView: View {
                         ForEach(1...4, id: \.self) { number in
                             Button(action: {
                                 selectedOption = number
+                                // ensure correct number of slots
+                                if viewModel.options.count < number {
+                                    while viewModel.options.count < number {
+                                        viewModel.options.append("")
+                                    }
+                                } else if viewModel.options.count > number {
+                                    viewModel.options = Array(viewModel.options.prefix(number))
+                                }
+                                viewModel.currentIndex = 0
                             }) {
                                 Text("\(number)")
                                     .font(.system(size: 36, weight: .regular, design: .rounded))
@@ -156,23 +63,21 @@ struct NumOtionsView: View {
 
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Next") {
-                        viewModel.setNumberOfOptions(selectedOption ?? 1)
-
-
                         goToOptionTitles = true
                     }
                     .font(.system(size: 18, weight: .medium, design: .rounded))
                     .foregroundColor(Color("red"))
-                    .disabled(selectedOption == nil) // optional: require selection
+                    .disabled(selectedOption == nil)
                 }
             }
             .navigationDestination(isPresented: $goToOptionTitles) {
-                OptionTitleView(viewModel: viewModel)
+                OptionTitleView()
+                    .environmentObject(viewModel)
             }
             .navigationDestination(isPresented: $goToHome) {
                 Home()
             }
-        } // NavigationStack
+        }
     }
 
     private func circleColor(for number: Int) -> Color {
@@ -185,7 +90,6 @@ struct NumOtionsView: View {
         }
     }
 }
-
 
 // cards (unchanged visuals)
 struct oneCard: View {
@@ -221,7 +125,7 @@ struct CardShape: Shape {
 struct condensedCards: View {
     var body: some View {
         VStack {
-            Spacer() // pushes cards down
+            Spacer()
             VStack(spacing: -35) {
                 oneCard(color: Color("red"))
                 oneCard(color: Color("peach"))
@@ -236,6 +140,6 @@ struct condensedCards: View {
 #Preview {
     NavigationStack {
         NumOtionsView()
+            .environmentObject(OptionsViewModel())
     }
 }
-

@@ -1,7 +1,11 @@
+//
+//  ShakePage2.swift
+//  clueApp
+//
+
 import SwiftUI
 import UIKit
 
-// MARK: - Model
 struct HeartShape: Identifiable {
     let id = UUID()
     var x: CGFloat
@@ -10,17 +14,14 @@ struct HeartShape: Identifiable {
     var rotation: Double = 0
 }
 
-// MARK: - UIKit Shake Detector
+// UIKit Shake Detector
 final class ShakeVC: UIViewController {
     var onShake: (() -> Void)?
-
     override var canBecomeFirstResponder: Bool { true }
-
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         becomeFirstResponder()
     }
-
     override func motionEnded(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
         if motion == .motionShake { onShake?() }
     }
@@ -28,7 +29,6 @@ final class ShakeVC: UIViewController {
 
 struct ShakeDetector: UIViewControllerRepresentable {
     let onShake: () -> Void
-    
     func makeUIViewController(context: Context) -> ShakeVC {
         let vc = ShakeVC()
         vc.view.backgroundColor = .clear
@@ -36,21 +36,19 @@ struct ShakeDetector: UIViewControllerRepresentable {
         vc.onShake = onShake
         return vc
     }
-    
     func updateUIViewController(_ uiViewController: ShakeVC, context: Context) {}
 }
 
-// MARK: - View
+// View
 struct Shaking: View {
-    var options: [String]   // ✅ يجي من ShakePage1
+    var options: [String]
+    @EnvironmentObject var viewModel: OptionsViewModel   // ✅ use shared model
     @State private var hearts: [HeartShape] = []
     @State private var isShaking = false
     @State private var goToNext = false
-    @State private var chosenResult: String = ""   // ✅ النتيجة المختارة
+    @State private var chosenResult: String = ""
 
     private let heartImages = ["heart1", "heart2", "heart3", "heart4", "heart5"]
-
-    private let jarSize = CGSize(width: 280, height: 320)
     private let xRange: ClosedRange<CGFloat> = -70...80
     private let yRange: ClosedRange<CGFloat> = 20...170
     private let xClamp: ClosedRange<CGFloat> = -50...90
@@ -59,19 +57,16 @@ struct Shaking: View {
     var body: some View {
         ZStack {
             Color.white.ignoresSafeArea()
-
             VStack(spacing: 20) {
                 Image("shake")
                     .resizable()
                     .scaledToFit()
                     .frame(width: 230, height: 230)
-                
                 ZStack {
                     Image("jar")
                         .resizable()
                         .scaledToFit()
                         .frame(width: 430, height: 430)
-
                     ForEach(hearts) { heart in
                         Image(heart.imageName)
                             .resizable()
@@ -83,7 +78,6 @@ struct Shaking: View {
                 }
                 .padding(.bottom, 40)
             }
-
             ShakeDetector {
                 startShaking()
             }
@@ -91,11 +85,11 @@ struct Shaking: View {
         .navigationBarBackButtonHidden(true)
         .onAppear { generateHearts() }
         .navigationDestination(isPresented: $goToNext) {
-            ShakePage3(result: chosenResult) // ✅ نرسل النتيجة
+            ShakePage3(result: chosenResult)
+                .environmentObject(viewModel)   // ✅ pass it forward
         }
     }
 
-    // MARK: - Helpers
     private func clamp(_ value: CGFloat, in range: ClosedRange<CGFloat>) -> CGFloat {
         min(max(value, range.lowerBound), range.upperBound)
     }
@@ -126,18 +120,16 @@ struct Shaking: View {
     private func startShaking() {
         guard !isShaking else { return }
         isShaking = true
-        
         var elapsed: TimeInterval = 0
         let interval: TimeInterval = 0.3
-        let duration: TimeInterval = 2.0
-        
+        let duration: TimeInterval = 5.0
         Timer.scheduledTimer(withTimeInterval: interval, repeats: true) { timer in
             reshuffleHearts()
             elapsed += interval
             if elapsed >= duration {
                 timer.invalidate()
                 isShaking = false
-                chosenResult = options.randomElement() ?? "No Option" // ✅ اختيار عشوائي
+                chosenResult = options.randomElement() ?? "No Option"
                 goToNext = true
             }
         }
@@ -147,5 +139,6 @@ struct Shaking: View {
 #Preview {
     NavigationStack {
         Shaking(options: ["One", "Two", "Three"])
+            .environmentObject(OptionsViewModel()) // ✅ preview with model
     }
 }

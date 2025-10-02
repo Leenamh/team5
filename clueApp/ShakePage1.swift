@@ -1,8 +1,13 @@
+//
+//  ShakePage1.swift
+//  clueApp
+//
+
 import SwiftUI
 
 struct ShakePage1: View {
-    @State private var options: [String] = ["", ""]  // قلبين ثابتة
-    @State private var currentPair: Int = 0          // يحدد أي جروب ظاهر الآن (pair)
+    @EnvironmentObject var viewModel: OptionsViewModel   // ✅ shared state
+    @State private var currentPair: Int = 0              // track which pair of hearts is visible
 
     @State private var goToHome = false
     @State private var goToNext = false
@@ -13,62 +18,63 @@ struct ShakePage1: View {
             
             GeometryReader { geo in
                 ZStack {
-                    // القلب الأول (يسار)
+                    // left heart
                     ZStack {
                         Image("HeartOption")
                             .resizable()
                             .scaledToFit()
                             .frame(width: 150, height: 150)
 
-                        TextField("Option \(currentPair * 2 + 1)", text: Binding(
-                            get: { options.indices.contains(currentPair * 2) ? options[currentPair * 2] : "" },
+                        TextField("Option", text: Binding(
+                            get: { viewModel.options.indices.contains(currentPair * 2) ? viewModel.options[currentPair * 2] : "" },
                             set: { newValue in
-                                if options.indices.contains(currentPair * 2) {
-                                    options[currentPair * 2] = newValue
+                                if viewModel.options.indices.contains(currentPair * 2) {
+                                    viewModel.options[currentPair * 2] = newValue
                                 } else {
-                                    options.append(newValue)
+                                    viewModel.options.append(newValue)
                                 }
                             }
                         ))
                         .multilineTextAlignment(.center)
                         .frame(width: 100)
-                        .foregroundColor(Color("red"))                        .font(.system(size: 16, weight: .bold))
+                        .foregroundColor(.red)
+                        .font(.custom("AvenirNextRounded-Bold", size: 16))
                         .background(Color.clear)
                         .disableAutocorrection(true)
                     }
                     .position(x: geo.size.width * 0.3, y:90)
 
-                    // القلب الثاني (يمين)
+                    // right heart
                     ZStack {
                         Image("HeartOption")
                             .resizable()
                             .scaledToFit()
                             .frame(width: 150, height: 150)
 
-                        TextField("Option \(currentPair * 2 + 2)", text: Binding(
-                            get: { options.indices.contains(currentPair * 2 + 1) ? options[currentPair * 2 + 1] : "" },
+                        TextField("Option", text: Binding(
+                            get: { viewModel.options.indices.contains(currentPair * 2 + 1) ? viewModel.options[currentPair * 2 + 1] : "" },
                             set: { newValue in
-                                if options.indices.contains(currentPair * 2 + 1) {
-                                    options[currentPair * 2 + 1] = newValue
+                                if viewModel.options.indices.contains(currentPair * 2 + 1) {
+                                    viewModel.options[currentPair * 2 + 1] = newValue
                                 } else {
-                                    options.append(newValue)
+                                    viewModel.options.append(newValue)
                                 }
                             }
                         ))
                         .multilineTextAlignment(.center)
                         .frame(width: 100)
-                        .foregroundColor(Color("red"))
-                        .font(.system(size: 16, weight: .bold))
+                        .foregroundColor(.red)
+                        .font(.custom("AvenirNextRounded-Bold", size: 16))
                         .background(Color.clear)
                         .disableAutocorrection(true)
                     }
                     .position(x: geo.size.width * 0.7, y:90)
 
-                    // زر +
+                    // add more button
                     Button(action: {
                         currentPair += 1
-                        if options.count < (currentPair + 1) * 2 {
-                            options.append(contentsOf: ["", ""]) // يضيف فيلديـن جدد
+                        if viewModel.options.count < (currentPair + 1) * 2 {
+                            viewModel.options.append(contentsOf: ["", ""]) // add 2 new slots
                         }
                     }) {
                         Image(systemName: "plus.circle.fill")
@@ -78,7 +84,7 @@ struct ShakePage1: View {
                     }
                     .position(x: geo.size.width / 2, y: 190)
 
-                    // صورة الجار
+                    // jar image
                     Image("EmptyJarOpen")
                         .resizable()
                         .scaledToFit()
@@ -103,7 +109,14 @@ struct ShakePage1: View {
         }
         .navigationDestination(isPresented: $goToHome) { Home() }
         .navigationDestination(isPresented: $goToNext) {
-            Shaking(options: options) // ✅ نرسل الخيارات كلها للصفحة الثانية
+            Shaking(options: viewModel.options.filter { !$0.isEmpty }) // send non-empty options
+                .environmentObject(viewModel) // ✅ keep sharing
+        }
+        .onAppear {
+            // ✅ make sure at least 2 slots exist
+            if viewModel.options.count < 2 {
+                viewModel.options = ["", ""]
+            }
         }
     }
 }
@@ -111,5 +124,6 @@ struct ShakePage1: View {
 #Preview {
     NavigationStack {
         ShakePage1()
+            .environmentObject(OptionsViewModel()) // ✅ preview with shared model
     }
 }
