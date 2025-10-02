@@ -1,73 +1,85 @@
-//
-//  ContentView.swift
-//  page1
-//
-//  Created by Hissah Alohali on 06/04/1447 AH.
-//
 
 import SwiftUI
 
 struct OptionTitleView: View {
-    @State private var selectedOption: Int? = nil
+    @ObservedObject var viewModel: OptionsViewModel
+
     @State private var optionTitle: String = ""
-    let clueRed = UIColor(named: "red")!
-    let cluePeach = UIColor(named: "peach")!
-    let cluePink = UIColor(named: "pink")!
-    let clueYellow = UIColor(named: "yellow")!
-    let clueLightYellow = UIColor(named: "lightYellow")!
-    var optionNumber = 1
+    @State private var goToDecisionPage = false
+
+
+    let clueLightYellow = UIColor(named: "lightYellow") ?? UIColor(red: 1, green: 0.925, blue: 0.655, alpha: 1)
+
     var body: some View {
-        ZStack{
+        ZStack {
             Color(clueLightYellow).ignoresSafeArea()
-            VStack(spacing: 40){
-                
-                
-                HStack{
-                    Button("Back") {
-                        // Handle back action
-                    }
-                    .foregroundColor(Color("red"))
-                    .font(.system(size: 18, weight: .medium, design: .rounded))
-                    
+
+            VStack(spacing: 40) {
+                // top bar: only Next (NO Back)
+                HStack {
                     Spacer()
-                    
                     Button("Next") {
-                        // Handle next action
+                        saveAndAdvance()
                     }
+                    .disabled(optionTitle.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                     .foregroundColor(Color("red"))
                     .font(.system(size: 18, weight: .medium, design: .rounded))
                 }
-                //.padding(.horizontal)
                 .padding(.top, 5)
-                .frame(maxWidth:.infinity, maxHeight: 1, alignment: .top)
-                
-                //Spacer()
                 .padding(.bottom, 30)
-                Text("Option \(optionNumber)")
+                .frame(maxWidth: .infinity, maxHeight: 1, alignment: .top)
+
+                // Option number
+                Text("Option \(viewModel.currentOptionNumber)")
                     .font(.system(size: 30, weight: .medium, design: .rounded))
                     .fontWeight(.medium)
                     .foregroundColor(Color("red"))
                     .multilineTextAlignment(.center)
-                
+
+                // Title field
                 TextField("Option title", text: $optionTitle)
                     .padding(.horizontal, 20)
                     .padding(.vertical, 12)
-                    .background(Color.white.opacity(0.6)) // very transparent
-                    .clipShape(Capsule()) // makes it elliptical
-                    .foregroundColor(Color("red")) // text color
-                    .overlay(
-                        Capsule().stroke(Color.white.opacity(0.5), lineWidth: 1))
-                    .frame(width:282, height:36)
-                
-                
+                    .background(Color.white.opacity(0.6))
+                    .clipShape(Capsule())
+                    .foregroundColor(Color("red"))
+                    .overlay(Capsule().stroke(Color.white.opacity(0.5), lineWidth: 1))
+                    .frame(width: 282, height: 36)
+
                 Spacer()
                 condensedCards()
+
+                // NavigationLink -> Card() (NO viewModel passed)
+                NavigationLink(destination: Card(), isActive: $goToDecisionPage) {
+                    EmptyView()
+                }
             }
             .padding()
+            .onAppear {
+                // populate the field with any existing value for the current option
+                optionTitle = viewModel.titleForCurrent()
+            }
+        }
+        .navigationBarBackButtonHidden(true) // hide nav back button
+    }
+
+    private func saveAndAdvance() {
+        let trimmed = optionTitle.trimmingCharacters(in: .whitespacesAndNewlines)
+        viewModel.updateCurrentTitle(trimmed)
+
+        if viewModel.goToNextOption() {
+            // advanced to next option -> update textfield
+            optionTitle = viewModel.titleForCurrent()
+        } else {
+            // last option completed -> go straight to your existing Card()
+            goToDecisionPage = true
         }
     }
-    
 }
+
 #Preview {
-    OptionTitleView()
+    NavigationStack {
+        OptionTitleView(viewModel: OptionsViewModel())
+    }
 }
+
