@@ -177,35 +177,35 @@ struct CardTextFieldView: View {
     var body: some View {
         switch title {
         case "Pros":
-            TextField("Write pros here...", text: Binding(
+            TextEditor( text: Binding(
                 get: { cardTexts[title] ?? "" },
                 set: { cardTexts[title] = $0 }
             ))
-
+            .scrollContentBackground(.hidden)
+            .autocorrectionDisabled()
             .padding(.horizontal, 20)
-            .padding(.vertical, 50)
-            .background(Color.white.opacity(0.6)) // Solid white background
-            .clipShape(RoundedRectangle(cornerRadius: 12)) // Rounded corners instead of capsule
+            .padding(.vertical, 15)
+            .background(Color.white.opacity(0.4)) // Solid white background
+            .clipShape(RoundedRectangle(cornerRadius: 20)) // Rounded corners instead of capsule
             .foregroundColor(.white) // Black text color
             .overlay(
                 RoundedRectangle(cornerRadius: 20)
                     .stroke(Color.white.opacity(0.3), lineWidth: 1) // Light gray border
             )
-            .frame(width: 282, height: 336)
+            .frame(width: 282, height: 152)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .multilineTextAlignment(.leading) // Left-aligned text
             .lineLimit(nil) // Allow multiple lines
             .font(.system(size: 16, weight: .regular)) // Regular font weight
-//            .padding(.horizontal, 30)
-//            .padding(.bottom, 150)
-//            .background(Color.white.opacity(0.6)) // very transparent
-//            .clipShape(Capsule()) // makes it elliptical
-//            .foregroundColor(Color("red")) // text color
-//            .frame(width:282, height:153)
-////            .overlay(
-////                Capsule().stroke(Color.white.opacity(0.5), lineWidth: 1))
-//            .textFieldStyle(.roundedBorder)
-//            //.padding(.vertical, 12)
+            
+            if (cardTexts[title] ?? "").isEmpty {
+                Text("List all the pros that you can think of")
+                    .foregroundColor(Color.gray.opacity(0.8))
+                    .frame(maxWidth: 260, alignment: .leading)
+                    .padding(.top, -55)
+                    .padding(.leading, 24)
+                    .allowsHitTesting(false)
+            }
             
         case "Cons":
             TextField("Write cons here...", text: Binding(
