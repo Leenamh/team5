@@ -208,40 +208,128 @@ struct CardTextFieldView: View {
             }
             
         case "Cons":
-            TextField("Write cons here...", text: Binding(
+            TextEditor( text: Binding(
                 get: { cardTexts[title] ?? "" },
                 set: { cardTexts[title] = $0 }
             ))
-            .textFieldStyle(RoundedBorderTextFieldStyle())
-            .padding(.horizontal, 30)
-            .padding(.bottom, 150)
+            .scrollContentBackground(.hidden)
+            .autocorrectionDisabled()
+            .padding(.horizontal, 20)
+            .padding(.vertical, 15)
+            .background(Color.white.opacity(0.4)) // Solid white background
+            .clipShape(RoundedRectangle(cornerRadius: 20)) // Rounded corners instead of capsule
+            .foregroundColor(.white) // Black text color
+            .overlay(
+                RoundedRectangle(cornerRadius: 20)
+                    .stroke(Color.white.opacity(0.3), lineWidth: 1) // Light gray border
+            )
+            .frame(width: 282, height: 152)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .multilineTextAlignment(.leading) // Left-aligned text
+            .lineLimit(nil) // Allow multiple lines
+            .font(.system(size: 16, weight: .regular)) // Regular font weight
+            
+            if (cardTexts[title] ?? "").isEmpty {
+                Text("List all the pros that you can think of")
+                    .foregroundColor(Color.gray.opacity(0.8))
+                    .frame(maxWidth: 260, alignment: .leading)
+                    .padding(.top, -55)
+                    .padding(.leading, 24)
+                    .allowsHitTesting(false)
+            }
             
         case "Offer and demand":
-            TextField("Write offer/demand details...", text: Binding(
+            TextEditor( text: Binding(
                 get: { cardTexts[title] ?? "" },
                 set: { cardTexts[title] = $0 }
             ))
-            .textFieldStyle(RoundedBorderTextFieldStyle())
-            .padding(.horizontal, 30)
-            .padding(.bottom, 150)
+            .scrollContentBackground(.hidden)
+            .autocorrectionDisabled()
+            .padding(.horizontal, 20)
+            .padding(.vertical, 15)
+            .background(Color.white.opacity(0.4)) // Solid white background
+            .clipShape(RoundedRectangle(cornerRadius: 20)) // Rounded corners instead of capsule
+            .foregroundColor(.white) // Black text color
+            .overlay(
+                RoundedRectangle(cornerRadius: 20)
+                    .stroke(Color.white.opacity(0.3), lineWidth: 1) // Light gray border
+            )
+            .frame(width: 282, height: 152)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .multilineTextAlignment(.leading) // Left-aligned text
+            .lineLimit(nil) // Allow multiple lines
+            .font(.system(size: 16, weight: .regular)) // Regular font weight
+            
+            if (cardTexts[title] ?? "").isEmpty {
+                Text("List all the pros that you can think of")
+                    .foregroundColor(Color.gray.opacity(0.8))
+                    .frame(maxWidth: 260, alignment: .leading)
+                    .padding(.top, -55)
+                    .padding(.leading, 24)
+                    .allowsHitTesting(false)
+            }
             
         case "In 5 Months":
-            TextField("Write 5 months plan...", text: Binding(
+            TextEditor( text: Binding(
                 get: { cardTexts[title] ?? "" },
                 set: { cardTexts[title] = $0 }
             ))
-            .textFieldStyle(RoundedBorderTextFieldStyle())
-            .padding(.horizontal, 30)
-            .padding(.bottom, 150)
+            .scrollContentBackground(.hidden)
+            .autocorrectionDisabled()
+            .padding(.horizontal, 20)
+            .padding(.vertical, 15)
+            .background(Color.white.opacity(0.4)) // Solid white background
+            .clipShape(RoundedRectangle(cornerRadius: 20)) // Rounded corners instead of capsule
+            .foregroundColor(.white) // Black text color
+            .overlay(
+                RoundedRectangle(cornerRadius: 20)
+                    .stroke(Color.white.opacity(0.3), lineWidth: 1) // Light gray border
+            )
+            .frame(width: 282, height: 152)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .multilineTextAlignment(.leading) // Left-aligned text
+            .lineLimit(nil) // Allow multiple lines
+            .font(.system(size: 16, weight: .regular)) // Regular font weight
+            
+            if (cardTexts[title] ?? "").isEmpty {
+                Text("List all the pros that you can think of")
+                    .foregroundColor(Color.gray.opacity(0.8))
+                    .frame(maxWidth: 260, alignment: .leading)
+                    .padding(.top, -55)
+                    .padding(.leading, 24)
+                    .allowsHitTesting(false)
+            }
             
         case "In 5 Years":
-            TextField("Write 5 years plan...", text: Binding(
+            TextEditor( text: Binding(
                 get: { cardTexts[title] ?? "" },
                 set: { cardTexts[title] = $0 }
             ))
-            .textFieldStyle(RoundedBorderTextFieldStyle())
-            .padding(.horizontal, 30)
-            .padding(.bottom, 150)
+            .scrollContentBackground(.hidden)
+            .autocorrectionDisabled()
+            .padding(.horizontal, 20)
+            .padding(.vertical, 15)
+            .background(Color.white.opacity(0.4)) // Solid white background
+            .clipShape(RoundedRectangle(cornerRadius: 20)) // Rounded corners instead of capsule
+            .foregroundColor(.white) // Black text color
+            .overlay(
+                RoundedRectangle(cornerRadius: 20)
+                    .stroke(Color.white.opacity(0.3), lineWidth: 1) // Light gray border
+            )
+            .frame(width: 282, height: 152)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .multilineTextAlignment(.leading) // Left-aligned text
+            .lineLimit(nil) // Allow multiple lines
+            .font(.system(size: 16, weight: .regular)) // Regular font weight
+            
+            if (cardTexts[title] ?? "").isEmpty {
+                Text("List all the pros that you can think of")
+                    .foregroundColor(Color.gray.opacity(0.8))
+                    .frame(maxWidth: 260, alignment: .leading)
+                    .padding(.top, -55)
+                    .padding(.leading, 24)
+                    .allowsHitTesting(false)
+            }
             
         default:
             EmptyView()

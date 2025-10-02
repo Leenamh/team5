@@ -1,77 +1,178 @@
-//
-//  NumOtionsView.swift
-//  clueApp
-//
-//  Created by Hissah Alohali on 08/04/1447 AH.
-//
 
 import SwiftUI
 
+final class OptionsViewModel: ObservableObject {
+    @Published var numberOfOptions: Int = 1 {
+        didSet { ensureTitlesSize() }
+    }
+    @Published var titles: [String] = []
+    @Published var currentIndex: Int = 0
+
+    private let userDefaultsKey = "com.example.optionsPayload"
+
+    init() {
+        load()
+    }
+
+    private func ensureTitlesSize() {
+        if titles.count < numberOfOptions {
+            titles += Array(repeating: "", count: numberOfOptions - titles.count)
+        } else if titles.count > numberOfOptions {
+            titles = Array(titles.prefix(numberOfOptions))
+        }
+        if currentIndex >= numberOfOptions {
+            currentIndex = max(0, numberOfOptions - 1)
+        }
+    }
+    
+
+
+    func setNumberOfOptions(_ n: Int) {
+        numberOfOptions = max(1, min(n, 10))
+        ensureTitlesSize()
+        save()
+    }
+
+    var currentOptionNumber: Int { currentIndex + 1 }
+
+    func titleForCurrent() -> String {
+        guard currentIndex < titles.count else { return "" }
+        return titles[currentIndex]
+    }
+
+    func updateCurrentTitle(_ title: String) {
+        ensureTitlesSize()
+        titles[currentIndex] = title
+        save()
+    }
+
+    func goToNextOption() -> Bool {
+        if currentIndex < numberOfOptions - 1 {
+            currentIndex += 1
+            save()
+            return true
+        }
+        return false
+    }
+
+    func goToPreviousOption() -> Bool {
+        if currentIndex > 0 {
+            currentIndex -= 1
+            save()
+            return true
+        }
+        return false
+    }
+
+    var isLastOption: Bool {
+        currentIndex == numberOfOptions - 1
+    }
+
+    struct Persisted: Codable {
+        var numberOfOptions: Int
+        var titles: [String]
+    }
+
+    private func save() {
+        let p = Persisted(numberOfOptions: numberOfOptions, titles: titles)
+        if let data = try? JSONEncoder().encode(p) {
+            UserDefaults.standard.set(data, forKey: userDefaultsKey)
+        }
+    }
+
+    private func load() {
+        guard let data = UserDefaults.standard.data(forKey: userDefaultsKey),
+              let p = try? JSONDecoder().decode(Persisted.self, from: data) else {
+            numberOfOptions = 1
+            titles = [""]
+            currentIndex = 0
+            return
+        }
+        numberOfOptions = max(1, p.numberOfOptions)
+        titles = p.titles
+        ensureTitlesSize()
+        currentIndex = 0
+    }
+
+    func reset() {
+        numberOfOptions = 1
+        titles = [""]
+        currentIndex = 0
+        save()
+    }
+}
+
 struct NumOtionsView: View {
+    @StateObject private var viewModel = OptionsViewModel()
     @State private var selectedOption: Int? = nil
-    @State private var goToCard = false   // trigger for Next navigation
-    @State private var goToHome = false   // trigger for Back navigation
+    @State private var goToOptionTitles = false
+    @State private var goToHome = false
 
     var body: some View {
-        ZStack {
-            Color("BG").ignoresSafeArea()
+        NavigationStack {
+            ZStack {
+                Color("BG").ignoresSafeArea()
 
-            VStack(spacing: 40) {
-                Text("How many options\ndo you have?")
-                    .font(.system(size: 30, weight: .medium, design: .rounded))
-                    .fontWeight(.medium)
-                    .foregroundColor(Color("red"))
-                    .multilineTextAlignment(.center)
+                VStack(spacing: 40) {
+                    Text("How many options\ndo you have?")
+                        .font(.system(size: 30, weight: .medium, design: .rounded))
+                        .fontWeight(.medium)
+                        .foregroundColor(Color("red"))
+                        .multilineTextAlignment(.center)
 
-                HStack(spacing: 24) {
-                    ForEach(1...4, id: \.self) { number in
-                        Button(action: {
-                            selectedOption = number
-                        }) {
-                            Text("\(number)")
-                                .font(.system(size: 36, weight: .regular, design: .rounded))
-                                .fontWeight(.bold)
-                                .frame(width: 60, height: 60)
-                                .background(circleColor(for: number))
-                                .clipShape(Circle())
-                                .overlay(
-                                    Circle()
-                                        .stroke(selectedOption == number ? Color.white : Color.clear, lineWidth: 5)
-                                )
-                                .foregroundColor(.white)
+                    HStack(spacing: 24) {
+                        ForEach(1...4, id: \.self) { number in
+                            Button(action: {
+                                selectedOption = number
+                            }) {
+                                Text("\(number)")
+                                    .font(.system(size: 36, weight: .regular, design: .rounded))
+                                    .fontWeight(.bold)
+                                    .frame(width: 60, height: 60)
+                                    .background(circleColor(for: number))
+                                    .clipShape(Circle())
+                                    .overlay(
+                                        Circle()
+                                            .stroke(selectedOption == number ? Color.white : Color.clear, lineWidth: 5)
+                                    )
+                                    .foregroundColor(.white)
+                            }
                         }
                     }
+                    Spacer()
+                    condensedCards()
                 }
-                Spacer()
-                condensedCards()
+                .padding()
             }
-            .padding()
-        }
-        .navigationBarBackButtonHidden(true) // hides default back button
-        .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button("Back") {
-                    goToHome = true
+            .navigationBarBackButtonHidden(true)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Back") {
+                        goToHome = true
+                    }
+                    .font(.system(size: 18, weight: .medium, design: .rounded))
+                    .foregroundColor(Color("red"))
                 }
-                .font(.system(size: 18, weight: .medium, design: .rounded))
-                .foregroundColor(Color("red"))
-            }
 
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button("Next") {
-                    goToCard = true
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Next") {
+                        viewModel.setNumberOfOptions(selectedOption ?? 1)
+
+
+                        goToOptionTitles = true
+                    }
+                    .font(.system(size: 18, weight: .medium, design: .rounded))
+                    .foregroundColor(Color("red"))
+                    .disabled(selectedOption == nil) // optional: require selection
                 }
-                .font(.system(size: 18, weight: .medium, design: .rounded))
-                .foregroundColor(Color("red"))
             }
-        }
-        // ✅ Modern way: navigationDestination instead of deprecated NavigationLink
-        .navigationDestination(isPresented: $goToCard) {
-            Card()
-        }
-        .navigationDestination(isPresented: $goToHome) {
-            Home()
-        }
+            .navigationDestination(isPresented: $goToOptionTitles) {
+                OptionTitleView(viewModel: viewModel)
+            }
+            .navigationDestination(isPresented: $goToHome) {
+                Home()
+            }
+        } // NavigationStack
     }
 
     private func circleColor(for number: Int) -> Color {
@@ -85,7 +186,8 @@ struct NumOtionsView: View {
     }
 }
 
-// cards
+
+// cards (unchanged visuals)
 struct oneCard: View {
     var color: Color
 
@@ -136,3 +238,4 @@ struct condensedCards: View {
         NumOtionsView()
     }
 }
+
