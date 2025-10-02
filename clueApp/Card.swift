@@ -187,7 +187,7 @@ struct CardTextFieldView: View {
             .padding(.vertical, 15)
             .background(Color.white.opacity(0.4)) // Solid white background
             .clipShape(RoundedRectangle(cornerRadius: 20)) // Rounded corners instead of capsule
-            .foregroundColor(.white) // Black text color
+            .foregroundColor(.gray) // gray text color
             .overlay(
                 RoundedRectangle(cornerRadius: 20)
                     .stroke(Color.white.opacity(0.3), lineWidth: 1) // Light gray border
@@ -196,7 +196,7 @@ struct CardTextFieldView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .multilineTextAlignment(.leading) // Left-aligned text
             .lineLimit(nil) // Allow multiple lines
-            .font(.system(size: 16, weight: .regular)) // Regular font weight
+            .font(.system(size: 16, weight: .bold)) // Regular font weight
             
             if (cardTexts[title] ?? "").isEmpty {
                 Text("List all the pros that you can think of")
@@ -218,7 +218,7 @@ struct CardTextFieldView: View {
             .padding(.vertical, 15)
             .background(Color.white.opacity(0.4)) // Solid white background
             .clipShape(RoundedRectangle(cornerRadius: 20)) // Rounded corners instead of capsule
-            .foregroundColor(.white) // Black text color
+            .foregroundColor(.gray) // gray text color
             .overlay(
                 RoundedRectangle(cornerRadius: 20)
                     .stroke(Color.white.opacity(0.3), lineWidth: 1) // Light gray border
@@ -230,7 +230,7 @@ struct CardTextFieldView: View {
             .font(.system(size: 16, weight: .regular)) // Regular font weight
             
             if (cardTexts[title] ?? "").isEmpty {
-                Text("List all the pros that you can think of")
+                Text("List all the cons that you can think of")
                     .foregroundColor(Color.gray.opacity(0.8))
                     .frame(maxWidth: 260, alignment: .leading)
                     .padding(.top, -55)
@@ -239,35 +239,71 @@ struct CardTextFieldView: View {
             }
             
         case "Offer and demand":
-            TextEditor( text: Binding(
-                get: { cardTexts[title] ?? "" },
-                set: { cardTexts[title] = $0 }
-            ))
-            .scrollContentBackground(.hidden)
-            .autocorrectionDisabled()
-            .padding(.horizontal, 20)
-            .padding(.vertical, 15)
-            .background(Color.white.opacity(0.4)) // Solid white background
-            .clipShape(RoundedRectangle(cornerRadius: 20)) // Rounded corners instead of capsule
-            .foregroundColor(.white) // Black text color
-            .overlay(
-                RoundedRectangle(cornerRadius: 20)
-                    .stroke(Color.white.opacity(0.3), lineWidth: 1) // Light gray border
-            )
-            .frame(width: 282, height: 152)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .multilineTextAlignment(.leading) // Left-aligned text
-            .lineLimit(nil) // Allow multiple lines
-            .font(.system(size: 16, weight: .regular)) // Regular font weight
-            
-            if (cardTexts[title] ?? "").isEmpty {
-                Text("List all the pros that you can think of")
-                    .foregroundColor(Color.gray.opacity(0.8))
-                    .frame(maxWidth: 260, alignment: .leading)
-                    .padding(.top, -55)
-                    .padding(.leading, 24)
-                    .allowsHitTesting(false)
-            }
+
+                // Centered content
+                HStack(alignment: .top, spacing: 20) {
+                    
+                    // Left TextEditor
+                    ZStack(alignment: .topLeading) {
+                        TextEditor(text: Binding(
+                            get: { cardTexts["offer"] ?? "" },
+                            set: { cardTexts["offer"] = $0 }
+                        ))
+                        .scrollContentBackground(.hidden)
+                        .autocorrectionDisabled()
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 15)
+                        .background(Color.white.opacity(0.4))
+                        .clipShape(RoundedRectangle(cornerRadius: 20))
+                        .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 20)
+                                .stroke(Color.white.opacity(0.3), lineWidth: 1)
+                        )
+                        .frame(width: 153, height: 113)
+                        .multilineTextAlignment(.leading)
+                        .font(.system(size: 16, weight: .regular))
+                        
+                        if (cardTexts["offer"] ?? "").isEmpty {
+                            Text("What does it\noffer you")
+                                .foregroundColor(Color.gray.opacity(0.7))
+                                .padding(.leading, 24)
+                                .padding(.top, 20)
+                        }
+                    }
+                    
+                    // Right TextEditor
+                    ZStack(alignment: .topLeading) {
+                        TextEditor(text: Binding(
+                            get: { cardTexts["demand"] ?? "" },
+                            set: { cardTexts["demand"] = $0 }
+                        ))
+                        .scrollContentBackground(.hidden)
+                        .autocorrectionDisabled()
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 15)
+                        .background(Color.white.opacity(0.4))
+                        .clipShape(RoundedRectangle(cornerRadius: 20))
+                        .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 20)
+                                .stroke(Color.white.opacity(0.3), lineWidth: 1)
+                        )
+                        .frame(width: 153, height: 113)
+                        .multilineTextAlignment(.leading)
+                        .font(.system(size: 16, weight: .regular))
+                        
+                        if (cardTexts["demand"] ?? "").isEmpty {
+                            Text("What does\ndemand from\nyou")
+                                .foregroundColor(Color.gray.opacity(0.7))
+                                .padding(.leading, 24)
+                                .padding(.top, 20)
+                        }
+                    }
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center) // center inside card
+
+
             
         case "In 5 Months":
             TextEditor( text: Binding(
@@ -280,7 +316,7 @@ struct CardTextFieldView: View {
             .padding(.vertical, 15)
             .background(Color.white.opacity(0.4)) // Solid white background
             .clipShape(RoundedRectangle(cornerRadius: 20)) // Rounded corners instead of capsule
-            .foregroundColor(.white) // Black text color
+            .foregroundColor(.gray) // gray text color
             .overlay(
                 RoundedRectangle(cornerRadius: 20)
                     .stroke(Color.white.opacity(0.3), lineWidth: 1) // Light gray border
@@ -292,7 +328,7 @@ struct CardTextFieldView: View {
             .font(.system(size: 16, weight: .regular)) // Regular font weight
             
             if (cardTexts[title] ?? "").isEmpty {
-                Text("List all the pros that you can think of")
+                Text("With this choice\nWhat do you see in 5 months ")
                     .foregroundColor(Color.gray.opacity(0.8))
                     .frame(maxWidth: 260, alignment: .leading)
                     .padding(.top, -55)
@@ -311,7 +347,7 @@ struct CardTextFieldView: View {
             .padding(.vertical, 15)
             .background(Color.white.opacity(0.4)) // Solid white background
             .clipShape(RoundedRectangle(cornerRadius: 20)) // Rounded corners instead of capsule
-            .foregroundColor(.white) // Black text color
+            .foregroundColor(.gray) // gray text color
             .overlay(
                 RoundedRectangle(cornerRadius: 20)
                     .stroke(Color.white.opacity(0.3), lineWidth: 1) // Light gray border
@@ -320,10 +356,10 @@ struct CardTextFieldView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .multilineTextAlignment(.leading) // Left-aligned text
             .lineLimit(nil) // Allow multiple lines
-            .font(.system(size: 16, weight: .regular)) // Regular font weight
+            .font(.system(size: 16, weight: .bold)) // Regular font weight
             
             if (cardTexts[title] ?? "").isEmpty {
-                Text("List all the pros that you can think of")
+                Text("With this choice\nWhat do you see in 5 months ")
                     .foregroundColor(Color.gray.opacity(0.8))
                     .frame(maxWidth: 260, alignment: .leading)
                     .padding(.top, -55)
