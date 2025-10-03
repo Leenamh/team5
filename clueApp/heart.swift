@@ -175,7 +175,7 @@ struct heart: View {
             averageScore = Double(scores.reduce(0, +)) / Double(scores.count)
             print("📊 Average = \(averageScore)")
 
-            if averageScore > 3 {
+            if averageScore >= 3 {
                 print("🎉 القرار مناسب ✅")
                 goToCompletion = true
             } else {
@@ -183,9 +183,11 @@ struct heart: View {
                 goToNotCompletion = true
             }
         } else {
-            viewModel.currentScoreIndex += 1
-            selectedOption = 3
-            dragValue = 3
+//            viewModel.currentScoreIndex += 1
+//            selectedOption = 3
+//            dragValue = 3
+            print("emtiy ")
+            goToNotCompletion = true
         }
     }
 }
