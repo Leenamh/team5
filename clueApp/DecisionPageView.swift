@@ -1,117 +1,115 @@
-//
-//  DecisionPageView.swift
-//  clueApp
-//
-//  Created by Wed Ahmed Alasiri on 10/04/1447 AH.
-//
-
-
-//
-// // perfer.swift
-// // perfer1
-//
-//  //Created by Wed Ahmed Alasiri on 09/04/1447 AH.
-//
-//
-
-
-
 import SwiftUI
 
 struct DecisionPageView: View {
-    @State private var selectedOption: String? = nil
-    
+    @EnvironmentObject var viewModel: OptionsViewModel
+    @State private var selectedOption: Int? = nil
+    @State private var currentQuestionIndex = 0
+    @State private var goToCompletion = false   // ✅ new navigation flag
+
+    let questions = [
+        "What do you prefer?",
+        "What can you tolerate?",
+        "Which will you take?",
+        "What demand can you meet?",
+        "In 5 months?",
+        "In 5 years?"
+    ]
+
     var body: some View {
         ZStack {
-            // Background
+            // Background gradient
             LinearGradient(
                 gradient: Gradient(colors: [
-                    Color(red: 255/255, green: 236/255, blue:167/255),//Color(red: 1.0, green: 0.95, blue: 0.75)
+                    Color(red: 255/255, green: 236/255, blue: 167/255),
                     Color(red: 1.0, green: 0.97, blue: 0.9)
                 ]),
                 startPoint: .top,
                 endPoint: .bottom
             )
             .ignoresSafeArea()
-            
+
             VStack(spacing: 40) {
-                
-                // Title
-                Spacer()
-                Spacer()
-                HStack(spacing: 0) {
-                   
-                    Text("What")
-                        .font(.system(size: 28, weight: .bold))
-                        .foregroundColor(Color(red: 1.0, green: 0.45, blue: 0.45)) // pink
-                    Text(" Do you prefer?")
-                        .font(.system(size: 24))
-                        .foregroundColor(Color(red: 1.0, green: 0.45, blue: 0.45))
-                }
-                
+                Spacer().frame(height: 30)
+
+                // Question title
+                Text(questions[currentQuestionIndex])
+                    .font(.system(size: 26, weight: .bold, design: .rounded))
+                    .foregroundColor(Color("red"))
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 10)
+
                 ZStack {
-                    //  OR text
+                    // OR text in background
                     Text("OR")
-                    
-                        .font(.system(size: 100, weight: .bold)) // حجم أكبر و Bold
-                        .foregroundColor(Color(red: 254/255, green: 93/255, blue: 91/255)) // FE5D5B
-                        .shadow(color: Color.black.opacity(0.25), radius: 4, x: 2, y: 2) // ظل خفيف
-                        .opacity(0.9) // شفافية بسيطة
-                    
-                
+                        .font(.system(size: 90, weight: .bold))
+                        .foregroundColor(Color("red"))
+                        .shadow(color: Color.black.opacity(0.25), radius: 4, x: 2, y: 2)
+                        .opacity(0.15)
                         .offset(x: -140, y: 20)
-                    
-                    VStack(spacing: 30) {
-                        Spacer()
-                        
-                        //  Pink Option
-                        OptionBox(
-                            text: "pink pink pink pink  \n  pink pink pink ",
-                            color: Color(red: 1.0, green: 0.45, blue: 0.45),
-                            isSelected: selectedOption == "pink"
-                        )
-                        .onTapGesture {
-                            selectedOption = "pink"
+
+                    VStack(spacing: 25) {
+                        ForEach(0..<viewModel.options.count, id: \.self) { idx in
+                            OptionBox(
+                                text: viewModel.details.indices.contains(idx) ?
+                                      viewModel.details[idx].label :
+                                      "Option \(idx+1)",
+                                color: Color("red"),
+                                isSelected: selectedOption == idx
+                            )
+                            .onTapGesture {
+                                withAnimation(.easeInOut) {
+                                    selectedOption = idx
+                                }
+                                // ✅ count this choice
+                                viewModel.incrementScore(for: idx)
+                                autoAdvance()
+                            }
                         }
-                        
-                        // Blue Option
-                        OptionBox(
-                            text: "blue blue blue blue\nblue blue blue blue blue",
-                            color: Color(red: 1.0, green: 0.45, blue: 0.45),//
-                            isSelected: selectedOption == "blue"
-                        )
-                        .onTapGesture {
-                            selectedOption = "blue"
-                        }
-                        Spacer()
                     }
                 }
-                
+
                 Spacer()
-                
-                //  Next button
-                Button(action: {
-                    print("Selected:", selectedOption ?? "None")
-                }) {
-                    Text("Next")
-                        .foregroundColor(Color(red: 1.0, green: 0.45, blue: 0.45))
-                        .font(.system(size: 20, weight: .medium))
-                }
-                .padding(.bottom, 40)
             }
             .padding()
+
+            // ✅ NavigationLink to CompletionView
+            NavigationLink(destination: CompletionView()
+                .environmentObject(viewModel),
+                isActive: $goToCompletion) {
+                EmptyView()
+            }
+            .hidden()
+        }
+        .navigationBarBackButtonHidden(true)
+    }
+
+    private func autoAdvance() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            withAnimation(.easeInOut) {
+                if currentQuestionIndex < questions.count - 1 {
+                    currentQuestionIndex += 1
+                    selectedOption = nil
+                } else {
+                    print("✅ Finished all questions")
+                    if let winner = viewModel.winningOption() {
+                        print("🎉 Winning option: \(winner.label) with score \(winner.score)")
+                    }
+                    goToCompletion = true   // ✅ navigate to CompletionView
+                }
+            }
         }
     }
 }
 
-// MARK: - Option Box
+// MARK: - Styled OptionBox
 struct OptionBox: View {
     let text: String
     let color: Color
     let isSelected: Bool
-    
+
     var body: some View {
         Text(text)
+            .font(.system(size: 20, weight: .medium, design: .rounded))
             .multilineTextAlignment(.center)
             .foregroundColor(color)
             .padding()
@@ -123,13 +121,16 @@ struct OptionBox: View {
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 20)
-                    .stroke(isSelected ? Color(red: 254/255, green: 93/255, blue: 91/255) : Color.clear, lineWidth: 3)
+                    .stroke(isSelected ? color : Color.clear, lineWidth: 3)
             )
             .padding(.horizontal, 40)
     }
 }
 
 #Preview {
-    DecisionPageView()
+    NavigationStack {
+        DecisionPageView()
+            .environmentObject(OptionsViewModel())
+    }
 }
 

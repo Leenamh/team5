@@ -22,7 +22,6 @@ struct NumOtionsView: View {
                         ForEach(1...4, id: \.self) { number in
                             Button(action: {
                                 selectedOption = number
-                                // ensure correct number of slots
                                 if viewModel.options.count < number {
                                     while viewModel.options.count < number {
                                         viewModel.options.append("")
@@ -31,6 +30,9 @@ struct NumOtionsView: View {
                                     viewModel.options = Array(viewModel.options.prefix(number))
                                 }
                                 viewModel.currentIndex = 0
+
+                                // ✅ keep details aligned with options
+                                viewModel.syncDetailsToOptions()
                             }) {
                                 Text("\(number)")
                                     .font(.system(size: 36, weight: .regular, design: .rounded))

@@ -56,10 +56,7 @@ struct ShakePage3: View {
         }
     }
 }
-
 #Preview {
-    NavigationStack {
-        ShakePage3(result: "Test Result")
-            .environmentObject(OptionsViewModel())  // ✅ preview with shared model
-    }
+    ShakePage3(result: "Test")
+        .environmentObject(OptionsViewModel())
 }

@@ -1,8 +1,3 @@
-//
-//  ShakePage2.swift
-//  clueApp
-//
-
 import SwiftUI
 import UIKit
 
@@ -84,9 +79,10 @@ struct Shaking: View {
         }
         .navigationBarBackButtonHidden(true)
         .onAppear { generateHearts() }
+        // ✅ FIX: pass environment forward
         .navigationDestination(isPresented: $goToNext) {
             ShakePage3(result: chosenResult)
-                .environmentObject(viewModel)   // ✅ pass it forward
+                .environmentObject(viewModel)   // ✅ FIXED
         }
     }
 

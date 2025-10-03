@@ -1,40 +1,34 @@
-//
-//  Card.swift
-//  clueApp
-//
-//  Created by Reema Alsaleh  on 08/04/1447 AH.
-//
-
 import SwiftUI
 
 // MARK: - Main ContentView
 struct Card: View {
+    @EnvironmentObject var viewModel: OptionsViewModel
     var body: some View {
         NavigationStack {
-                    DecisionPage()
-                }
+            DecisionPage().environmentObject(viewModel)
+        }
     }
 }
 
 #Preview {
-    Card()
+    Card().environmentObject(OptionsViewModel())
 }
 
 // MARK: - Decision Page Layout
 struct DecisionPage: View {
+    @EnvironmentObject var viewModel: OptionsViewModel
     @State private var expandedCard: String? = nil
-    @State private var cardTexts: [String: String] = [:] // store user input for each card
-    @State private var goToNextOption = false
-    var optionNumber = 1;
+    @State private var goToDecisionPageView = false
+    @State private var goToHeart = false   // ✅ new flag
+
     var body: some View {
         ZStack {
-            // Background
             Color("BG").ignoresSafeArea()
-            
+
+            // fixed header + label
             VStack {
-                // Top fixed section (Option 1 + Next button)
                 HStack {
-                    Text("Option \(optionNumber)")
+                    Text("Option \(viewModel.currentIndex + 1)")
                         .font(.headline)
                         .foregroundColor(.white)
                         .padding(.vertical, 40)
@@ -42,16 +36,26 @@ struct DecisionPage: View {
                         .background(Color(red: 1.0, green: 0.831, blue: 0.541))
                         .cornerRadius(28)
                         .padding(.leading, -35)
-                        .offset(x: 4, y: -130)
-                    
+                        .offset(x: 4, y: -100)
                     Spacer()
-                    
                 }
-                .padding()
-                
-                Spacer() // ensures cards are at the bottom
-                
-                // Cards stack
+                .padding(.horizontal)
+
+                // label from the selected option
+                if viewModel.details.indices.contains(viewModel.currentIndex) {
+                    Text(viewModel.details[viewModel.currentIndex].label)
+                        .font(.system(size: 25, weight: .bold))
+                        .foregroundColor(.red)
+                        .multilineTextAlignment(.center)
+                        .padding(.top, -10)
+                }
+
+                Spacer()
+            }
+
+            // cards stack
+            VStack {
+                Spacer()
                 VStack(spacing: -40) {
                     ForEach(["Pros", "Cons", "Offer and demand", "In 5 Months", "In 5 Years"], id: \.self) { title in
                         CurvedCard(
@@ -64,30 +68,108 @@ struct DecisionPage: View {
                             }
                         }
                         .overlay(
-                            expandedCard == title ? CardTextFieldView(title: title, cardTexts: $cardTexts) : nil,
-                            alignment: .bottomLeading
+                            Group {
+                                if expandedCard == title,
+                                   viewModel.details.indices.contains(viewModel.currentIndex) {
+
+                                    let idx = viewModel.currentIndex
+
+                                    switch title {
+                                    case "Pros":
+                                        CardTextFieldView(
+                                            title: title,
+                                            text: Binding(
+                                                get: { viewModel.details[idx].pros },
+                                                set: { viewModel.details[idx].pros = $0 }
+                                            )
+                                        )
+
+                                    case "Cons":
+                                        CardTextFieldView(
+                                            title: title,
+                                            text: Binding(
+                                                get: { viewModel.details[idx].cons },
+                                                set: { viewModel.details[idx].cons = $0 }
+                                            )
+                                        )
+
+                                    case "Offer and demand":
+                                        CardTextFieldView(
+                                            title: title,
+                                            text: Binding(
+                                                get: { viewModel.details[idx].offer },
+                                                set: { viewModel.details[idx].offer = $0 }
+                                            ),
+                                            secondText: Binding(
+                                                get: { viewModel.details[idx].demand },
+                                                set: { viewModel.details[idx].demand = $0 }
+                                            )
+                                        )
+
+                                    case "In 5 Months":
+                                        CardTextFieldView(
+                                            title: title,
+                                            text: Binding(
+                                                get: { viewModel.details[idx].in5Months },
+                                                set: { viewModel.details[idx].in5Months = $0 }
+                                            )
+                                        )
+
+                                    case "In 5 Years":
+                                        CardTextFieldView(
+                                            title: title,
+                                            text: Binding(
+                                                get: { viewModel.details[idx].in5Years },
+                                                set: { viewModel.details[idx].in5Years = $0 }
+                                            )
+                                        )
+
+                                    default:
+                                        EmptyView()
+                                    }
+                                }
+                            },
+                            alignment: .center
                         )
                     }
                 }
                 .padding(.bottom, -30)
             }
-            .padding(.top, 10)
+
+            // ✅ NavigationLink to DecisionPageView
+            NavigationLink(destination: DecisionPageView().environmentObject(viewModel),
+                           isActive: $goToDecisionPageView) {
+                EmptyView()
+            }
+            .hidden()
+
+            // ✅ NavigationLink to Heart page
+            NavigationLink(destination: heart().environmentObject(viewModel),
+                           isActive: $goToHeart) {
+                EmptyView()
+            }
+            .hidden()
         }
         .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button("Next") {
-                    goToNextOption
+                    if !viewModel.goToNextOption() {
+                        // ✅ last option finished → decide where to go
+                        if viewModel.options.count == 1 {
+                            goToHeart = true   // go heart if only 1 option
+                        } else {
+                            goToDecisionPageView = true
+                        }
+                    }
+                    withAnimation { expandedCard = nil }
                 }
                 .font(.system(size: 18, weight: .medium, design: .rounded))
                 .foregroundColor(Color("red"))
             }
-        } .navigationDestination(isPresented: $goToNextOption) {
-            Card()
         }
     }
-    
-    // MARK: - Function to get card color
+
     func getColor(for title: String) -> Color {
         switch title {
         case "Pros": return Color(red: 254/255, green: 93/255, blue: 91/255)
@@ -96,6 +178,80 @@ struct DecisionPage: View {
         case "In 5 Months": return Color(red: 255/255, green: 212/255, blue: 138/255)
         case "In 5 Years": return Color(red: 252/255, green: 231/255, blue: 145/255)
         default: return .gray
+        }
+    }
+}
+
+
+// MARK: - CardTextFieldView (new binding-based)
+struct CardTextFieldView: View {
+    var title: String
+    @Binding var text: String
+    @Binding var secondText: String
+
+    init(title: String, text: Binding<String>, secondText: Binding<String> = .constant("")) {
+        self.title = title
+        self._text = text
+        self._secondText = secondText
+    }
+
+    var body: some View {
+        switch title {
+        case "Pros":
+            editorBinding($text, placeholder: "List all the pros that you can think of", bold: true)
+
+        case "Cons":
+            editorBinding($text, placeholder: "List all the cons that you can think of")
+
+        case "Offer and demand":
+            HStack(alignment: .top, spacing: 20) {
+                editorBinding($text,       placeholder: "What does it\noffer you", width: 153, height: 113)
+                editorBinding($secondText, placeholder: "What does\ndemand from\nyou", width: 153, height: 113)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+
+        case "In 5 Months":
+            editorBinding($text, placeholder: "With this choice\nWhat do you see in 5 months ")
+
+        case "In 5 Years":
+            editorBinding($text, placeholder: "With this choice\nWhat do you see in 5 years ", bold: true)
+
+        default:
+            EmptyView()
+        }
+    }
+
+    @ViewBuilder
+    private func editorBinding(_ value: Binding<String>,
+                               placeholder: String,
+                               width: CGFloat = 282,
+                               height: CGFloat = 152,
+                               bold: Bool = false) -> some View {
+        ZStack(alignment: .topLeading) {
+            TextEditor(text: value)
+                .scrollContentBackground(.hidden)
+                .autocorrectionDisabled()
+                .padding(.horizontal, 20)
+                .padding(.vertical, 15)
+                .background(Color.white.opacity(0.4))
+                .clipShape(RoundedRectangle(cornerRadius: 20))
+                .foregroundColor(.gray)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 20)
+                        .stroke(Color.white.opacity(0.3), lineWidth: 1)
+                )
+                .frame(width: width, height: height)
+                .multilineTextAlignment(.leading)
+                .font(.system(size: 16, weight: bold ? .bold : .regular))
+
+            if value.wrappedValue.isEmpty {
+                Text(placeholder)
+                    .foregroundColor(Color.gray.opacity(0.8))
+                    .frame(maxWidth: width - 22, alignment: .leading)
+                    .padding(.top, 20)
+                    .padding(.leading, 24)
+                    .allowsHitTesting(false)
+            }
         }
     }
 }
@@ -144,231 +300,6 @@ struct OpenedCardShape: Shape {
         path.addQuadCurve(to: CGPoint(x: rect.width, y: -100), control: CGPoint(x: rect.width, y: 0))
         path.addLine(to: CGPoint(x: rect.width, y: rect.height))
         path.closeSubpath()
-        return path
-    }
-}
-
-// MARK: - Extension for corner radius on specific corners
-extension View {
-    func cornerRadius(_ radius: CGFloat, corners: UIRectCorner) -> some View {
-        clipShape(RoundedCorner(radius: radius, corners: corners))
-    }
-}
-
-struct RoundedCorner: Shape {
-    var radius: CGFloat = .infinity
-    var corners: UIRectCorner = .allCorners
-
-    func path(in rect: CGRect) -> Path {
-        let path = UIBezierPath(
-            roundedRect: rect,
-            byRoundingCorners: corners,
-            cornerRadii: CGSize(width: radius, height: radius)
-        )
-        return Path(path.cgPath)
-    }
-}
-
-// MARK: - Helper View for Card TextFields
-struct CardTextFieldView: View {
-    var title: String
-    @Binding var cardTexts: [String: String]
-
-    var body: some View {
-        switch title {
-        case "Pros":
-            TextEditor( text: Binding(
-                get: { cardTexts[title] ?? "" },
-                set: { cardTexts[title] = $0 }
-            ))
-            .scrollContentBackground(.hidden)
-            .autocorrectionDisabled()
-            .padding(.horizontal, 20)
-            .padding(.vertical, 15)
-            .background(Color.white.opacity(0.4)) // Solid white background
-            .clipShape(RoundedRectangle(cornerRadius: 20)) // Rounded corners instead of capsule
-            .foregroundColor(.gray) // gray text color
-            .overlay(
-                RoundedRectangle(cornerRadius: 20)
-                    .stroke(Color.white.opacity(0.3), lineWidth: 1) // Light gray border
-            )
-            .frame(width: 282, height: 152)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .multilineTextAlignment(.leading) // Left-aligned text
-            .lineLimit(nil) // Allow multiple lines
-            .font(.system(size: 16, weight: .bold)) // Regular font weight
-            
-            if (cardTexts[title] ?? "").isEmpty {
-                Text("List all the pros that you can think of")
-                    .foregroundColor(Color.gray.opacity(0.8))
-                    .frame(maxWidth: 260, alignment: .leading)
-                    .padding(.top, -55)
-                    .padding(.leading, 24)
-                    .allowsHitTesting(false)
-            }
-            
-        case "Cons":
-            TextEditor( text: Binding(
-                get: { cardTexts[title] ?? "" },
-                set: { cardTexts[title] = $0 }
-            ))
-            .scrollContentBackground(.hidden)
-            .autocorrectionDisabled()
-            .padding(.horizontal, 20)
-            .padding(.vertical, 15)
-            .background(Color.white.opacity(0.4)) // Solid white background
-            .clipShape(RoundedRectangle(cornerRadius: 20)) // Rounded corners instead of capsule
-            .foregroundColor(.gray) // gray text color
-            .overlay(
-                RoundedRectangle(cornerRadius: 20)
-                    .stroke(Color.white.opacity(0.3), lineWidth: 1) // Light gray border
-            )
-            .frame(width: 282, height: 152)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .multilineTextAlignment(.leading) // Left-aligned text
-            .lineLimit(nil) // Allow multiple lines
-            .font(.system(size: 16, weight: .regular)) // Regular font weight
-            
-            if (cardTexts[title] ?? "").isEmpty {
-                Text("List all the cons that you can think of")
-                    .foregroundColor(Color.gray.opacity(0.8))
-                    .frame(maxWidth: 260, alignment: .leading)
-                    .padding(.top, -55)
-                    .padding(.leading, 24)
-                    .allowsHitTesting(false)
-            }
-            
-        case "Offer and demand":
-
-                // Centered content
-                HStack(alignment: .top, spacing: 20) {
-                    
-                    // Left TextEditor
-                    ZStack(alignment: .topLeading) {
-                        TextEditor(text: Binding(
-                            get: { cardTexts["offer"] ?? "" },
-                            set: { cardTexts["offer"] = $0 }
-                        ))
-                        .scrollContentBackground(.hidden)
-                        .autocorrectionDisabled()
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 15)
-                        .background(Color.white.opacity(0.4))
-                        .clipShape(RoundedRectangle(cornerRadius: 20))
-                        .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 20)
-                                .stroke(Color.white.opacity(0.3), lineWidth: 1)
-                        )
-                        .frame(width: 153, height: 113)
-                        .multilineTextAlignment(.leading)
-                        .font(.system(size: 16, weight: .regular))
-                        
-                        if (cardTexts["offer"] ?? "").isEmpty {
-                            Text("What does it\noffer you")
-                                .foregroundColor(Color.gray.opacity(0.7))
-                                .padding(.leading, 24)
-                                .padding(.top, 20)
-                        }
-                    }
-                    
-                    // Right TextEditor
-                    ZStack(alignment: .topLeading) {
-                        TextEditor(text: Binding(
-                            get: { cardTexts["demand"] ?? "" },
-                            set: { cardTexts["demand"] = $0 }
-                        ))
-                        .scrollContentBackground(.hidden)
-                        .autocorrectionDisabled()
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 15)
-                        .background(Color.white.opacity(0.4))
-                        .clipShape(RoundedRectangle(cornerRadius: 20))
-                        .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 20)
-                                .stroke(Color.white.opacity(0.3), lineWidth: 1)
-                        )
-                        .frame(width: 153, height: 113)
-                        .multilineTextAlignment(.leading)
-                        .font(.system(size: 16, weight: .regular))
-                        
-                        if (cardTexts["demand"] ?? "").isEmpty {
-                            Text("What does\ndemand from\nyou")
-                                .foregroundColor(Color.gray.opacity(0.7))
-                                .padding(.leading, 24)
-                                .padding(.top, 20)
-                        }
-                    }
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center) // center inside card
-
-
-            
-        case "In 5 Months":
-            TextEditor( text: Binding(
-                get: { cardTexts[title] ?? "" },
-                set: { cardTexts[title] = $0 }
-            ))
-            .scrollContentBackground(.hidden)
-            .autocorrectionDisabled()
-            .padding(.horizontal, 20)
-            .padding(.vertical, 15)
-            .background(Color.white.opacity(0.4)) // Solid white background
-            .clipShape(RoundedRectangle(cornerRadius: 20)) // Rounded corners instead of capsule
-            .foregroundColor(.gray) // gray text color
-            .overlay(
-                RoundedRectangle(cornerRadius: 20)
-                    .stroke(Color.white.opacity(0.3), lineWidth: 1) // Light gray border
-            )
-            .frame(width: 282, height: 152)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .multilineTextAlignment(.leading) // Left-aligned text
-            .lineLimit(nil) // Allow multiple lines
-            .font(.system(size: 16, weight: .regular)) // Regular font weight
-            
-            if (cardTexts[title] ?? "").isEmpty {
-                Text("With this choice\nWhat do you see in 5 months ")
-                    .foregroundColor(Color.gray.opacity(0.8))
-                    .frame(maxWidth: 260, alignment: .leading)
-                    .padding(.top, -55)
-                    .padding(.leading, 24)
-                    .allowsHitTesting(false)
-            }
-            
-        case "In 5 Years":
-            TextEditor( text: Binding(
-                get: { cardTexts[title] ?? "" },
-                set: { cardTexts[title] = $0 }
-            ))
-            .scrollContentBackground(.hidden)
-            .autocorrectionDisabled()
-            .padding(.horizontal, 20)
-            .padding(.vertical, 15)
-            .background(Color.white.opacity(0.4)) // Solid white background
-            .clipShape(RoundedRectangle(cornerRadius: 20)) // Rounded corners instead of capsule
-            .foregroundColor(.gray) // gray text color
-            .overlay(
-                RoundedRectangle(cornerRadius: 20)
-                    .stroke(Color.white.opacity(0.3), lineWidth: 1) // Light gray border
-            )
-            .frame(width: 282, height: 152)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .multilineTextAlignment(.leading) // Left-aligned text
-            .lineLimit(nil) // Allow multiple lines
-            .font(.system(size: 16, weight: .bold)) // Regular font weight
-            
-            if (cardTexts[title] ?? "").isEmpty {
-                Text("With this choice\nWhat do you see in 5 months ")
-                    .foregroundColor(Color.gray.opacity(0.8))
-                    .frame(maxWidth: 260, alignment: .leading)
-                    .padding(.top, -55)
-                    .padding(.leading, 24)
-                    .allowsHitTesting(false)
-            }
-            
-        default:
-            EmptyView()
-        }
+        return path;
     }
 }

@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct Home: View {
+    @EnvironmentObject var optionsVM: OptionsViewModel
+
     @State private var offsetX: CGFloat = 0.0 // track circle movement
     @State private var goToNumOptions = false // navigate Wisely
     @State private var goToRandom = false     // navigate Randomly
@@ -91,10 +93,12 @@ struct Home: View {
             }
             // ✅ navigation destinations
             .navigationDestination(isPresented: $goToNumOptions) {
-                NumOtionsView()
+                NumOtionsView()        .environmentObject(optionsVM)   // ✅ نمرر نفس النسخة
+
             }
             .navigationDestination(isPresented: $goToRandom) {
-                ShakePage1()
+                ShakePage1()        .environmentObject(optionsVM)   // ✅ نمرر نفس النسخة
+
             }
             .navigationBarBackButtonHidden(true)
         }
@@ -103,4 +107,5 @@ struct Home: View {
 
 #Preview {
     Home()
+        .environmentObject(OptionsViewModel())  
 }
