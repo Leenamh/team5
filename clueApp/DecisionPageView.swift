@@ -28,23 +28,33 @@ struct DecisionPageView: View {
             )
             .ignoresSafeArea()
 
+            
+           
             VStack(spacing: 40) {
+                
                 Spacer().frame(height: 30)
 
                 // Question title
                 Text(questions[currentQuestionIndex])
-                    .font(.system(size: 26, weight: .bold, design: .rounded))
+                    .font(.system(size: 25.8, weight: .bold, design: .rounded))
                     .foregroundColor(Color("red"))
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 10)
-
+                Spacer().frame(height: 40)
+                
+                
+                
+                
                 ZStack {
+                    //Spacer()
+                    Spacer().frame(height: 300)
+                
                     // OR text in background
                     Text("OR")
                         .font(.system(size: 90, weight: .bold))
                         .foregroundColor(Color("red"))
                         .shadow(color: Color.black.opacity(0.25), radius: 4, x: 2, y: 2)
-                        .opacity(0.15)
+                        .opacity(0.9)
                         .offset(x: -140, y: 20)
 
                     VStack(spacing: 25) {
@@ -69,6 +79,7 @@ struct DecisionPageView: View {
                 }
 
                 Spacer()
+              
             }
             .padding()
 
@@ -83,6 +94,9 @@ struct DecisionPageView: View {
         .navigationBarBackButtonHidden(true)
     }
 
+    
+    
+    
     private func autoAdvance() {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             withAnimation(.easeInOut) {
@@ -133,4 +147,8 @@ struct OptionBox: View {
             .environmentObject(OptionsViewModel())
     }
 }
+
+
+
+
 
