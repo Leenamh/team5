@@ -3,10 +3,10 @@
 ////  clueApp
 ////
 ////  Created by Wed Ahmed Alasiri on 08/04/1447 AH.
-////  Created by Wed Ahmed Alasiri on 08/04/1447 AH.
+
 ////
 //
-
+//
 import SwiftUI
 
 struct heart: View {
@@ -21,6 +21,8 @@ struct heart: View {
     @State private var showResult: Bool = false
     @State private var goToCompletion = false // ✅ للتنقل إذا القرار مناسب
     @State private var goToNotCompletion = false // ✅ للتنقل إذا القرار غير مناسب
+    @State private var goToNoDataEntred = false
+    
     
     var body: some View {
         NavigationStack {
@@ -121,8 +123,23 @@ struct heart: View {
                         destination: NotCompletionView().environmentObject(viewModel),
                         isActive: $goToNotCompletion
                     ) { EmptyView() }.hidden()
+//                    
+//                    NavigationLink(
+//                                destination: emptyInput().environmentObject(viewModel),
+//                                isActive: $goToNoDataEntred
+//                            ) { EmptyView() }.hidden()
+//                    
+                    
                 }
             }
+            
+            .onAppear {
+                       // 🔄 إعادة التعيين عند فتح الشاشة
+                       viewModel.currentScoreIndex = 0
+                       viewModel.currentIndex = 0
+                       selectedOption = 3
+                       dragValue = 3
+                   }
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(action: {
@@ -140,12 +157,12 @@ struct heart: View {
         guard viewModel.details.indices.contains(viewModel.currentIndex) else { return "" }
         let detail = viewModel.details[viewModel.currentIndex]
         switch viewModel.currentScoreIndex {
-        case 0: return "How satisfied are you with: \(detail.pros)"
-        case 1: return "How satisfied are you with: \(detail.cons)"
-        case 2: return "How satisfied are you with: \(detail.offer)"
-        case 3: return "How satisfied are you with: \(detail.demand)"
-        case 4: return "How satisfied are you with: \(detail.in5Months)"
-        case 5: return "How satisfied are you with: \(detail.in5Years)"
+        case 0: return "How satisfied are you with: \(detail.pros)?" //+ " 1"
+        case 1: return "How satisfied are you with: \(detail.cons)" + " 2"
+        case 2: return "How satisfied are you with: \(detail.offer)" + " 3"
+        case 3: return "How satisfied are you with: \(detail.demand)" + " 4"
+        case 4: return "How satisfied are you with: \(detail.in5Months)" + " 5"
+        case 5: return "How satisfied are you with: \(detail.in5Years)" + " 6"
         default: return ""
         }
     }
@@ -175,19 +192,25 @@ struct heart: View {
             averageScore = Double(scores.reduce(0, +)) / Double(scores.count)
             print("📊 Average = \(averageScore)")
 
-            if averageScore >= 3 {
+            if averageScore > 3 {
                 print("🎉 القرار مناسب ✅")
                 goToCompletion = true
-            } else {
+            } else if averageScore <= 3 {
                 print("⚠️ القرار غير مناسب ❌")
                 goToNotCompletion = true
+            }else{
+                print("empty data  ")
+                goToNoDataEntred = true
             }
-        } else {
-//            viewModel.currentScoreIndex += 1
-//            selectedOption = 3
-//            dragValue = 3
-            print("emtiy ")
-            goToNotCompletion = true
+            
+            
+            
+        }else{
+            viewModel.currentScoreIndex += 1
+            selectedOption = 3
+            dragValue = 3
+           
+           
         }
     }
 }
@@ -201,9 +224,7 @@ struct heart: View {
 
 
 
-
-
-
+         
 
 // code for text if its so long
 //import SwiftUI
