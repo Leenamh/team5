@@ -10,7 +10,17 @@ struct OptionDetail: Identifiable, Equatable {
     var in5Months: String = ""
     var in5Years: String = ""
     // ✅ scoring counter
-    var score: Int = 0
+       var score: Int = 0
+//        var prosScore: Int = 0
+//    
+    var prosScore: Int?
+        var consScore: Int?
+        var offerScore: Int?
+        var demandScore: Int?
+        var in5MonthsScore: Int?
+        var in5YearsScore: Int?
+    
+    
 }
 
 let questions: [(title: String, keyPath: KeyPath<OptionDetail, String>)] = [
@@ -24,6 +34,9 @@ let questions: [(title: String, keyPath: KeyPath<OptionDetail, String>)] = [
 
 /// Shared state for all option pages
 final class OptionsViewModel: ObservableObject {
+    
+    @Published var currentScoreIndex: Int = 0 //wed 
+
     /// Still used by Shaking pages – do NOT remove
     @Published var options: [String] = ["", ""]
 
@@ -40,6 +53,9 @@ final class OptionsViewModel: ObservableObject {
     func titleForCurrent() -> String {
         guard options.indices.contains(currentIndex) else { return "" }
         return options[currentIndex]
+        
+        
+        
     }
 
     /// Keep `details` length and labels matched to `options`
@@ -100,3 +116,5 @@ final class OptionsViewModel: ObservableObject {
         details.max(by: { $0.score < $1.score })
     }
 }
+
+
