@@ -48,6 +48,8 @@ struct heart: View {
                         .fontWeight(.medium)
                         .foregroundColor(Color(red: 1.0, green: 116/255, blue: 114/255))
                         .multilineTextAlignment(.center)
+                        .lineLimit(nil)
+                        .fixedSize(horizontal: false, vertical: true)
                         .padding()
                     
                     Spacer().frame(height: 50).padding(.bottom, 60)
@@ -106,6 +108,8 @@ struct heart: View {
                     Button(action: {
                         saveScoreAndAdvance()
                     }) {
+                  
+
                         Text("Next")
                             .foregroundColor(Color(red: 1.0, green: 0.455, blue: 0.447))
                             .font(.title3)
@@ -140,15 +144,34 @@ struct heart: View {
                        selectedOption = 3
                        dragValue = 3
                    }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: {
-                        dismiss()
-                    }) {
-                        // زر الرجوع (اختياري)
-                    }
-                }
-            }
+//            .toolbar {
+//                ToolbarItem(placement: .navigationBarLeading) {
+//                    Button(action: {
+//                        dismiss()
+//                    }) {
+//                        // زر الرجوع (اختياري)
+//                    }
+//                }
+//            }
+            
+            
+            
+//            .toolbar {
+//                ToolbarItem(placement: .navigationBarLeading) {
+//                    Button(action: {
+////                        dismiss()
+//                    }) {
+//                        HStack {
+//                            Image(systemName: "chevron.backward")
+//                                .foregroundColor(Color(red: 1.0, green: 116/255, blue: 114/255))
+//                            Text("Back")
+//                                .foregroundColor(Color(red: 1.0, green: 116/255, blue: 114/255))
+//                                .font(.system(size: 18, weight: .medium, design: .rounded))
+//                        }
+//                    }
+//                }
+//            }
+
         }
     }
 
@@ -157,12 +180,12 @@ struct heart: View {
         guard viewModel.details.indices.contains(viewModel.currentIndex) else { return "" }
         let detail = viewModel.details[viewModel.currentIndex]
         switch viewModel.currentScoreIndex {
-        case 0: return "How satisfied are you with: \(detail.pros)?" //+ " 1"
-        case 1: return "How satisfied are you with: \(detail.cons)" + " 2"
-        case 2: return "How satisfied are you with: \(detail.offer)" + " 3"
-        case 3: return "How satisfied are you with: \(detail.demand)" + " 4"
-        case 4: return "How satisfied are you with: \(detail.in5Months)" + " 5"
-        case 5: return "How satisfied are you with: \(detail.in5Years)" + " 6"
+        case 0: return "1-How satisfied are you with: \(detail.pros)?" //+ " 1"
+        case 1: return "2-How satisfied are you with: \(detail.cons)?"
+        case 2: return "3-How satisfied are you with: \(detail.offer)?"
+        case 3: return "4-How satisfied are you with: \(detail.demand)?"
+        case 4: return "4-How satisfied are you with: \(detail.in5Months)?"
+        case 5: return "6-How satisfied are you with: \(detail.in5Years)?"
         default: return ""
         }
     }

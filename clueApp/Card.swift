@@ -153,11 +153,33 @@ struct DecisionPage: View {
         .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
+                
+                
+                
+                
                 Button("Next") {
+                    guard viewModel.details.indices.contains(viewModel.currentIndex) else { return }
+                    let current = viewModel.details[viewModel.currentIndex]
+                    
+                    // Check that the user entered at least the basic fields (without in5Months)
+                    let hasPros = !current.pros.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                    let hasCons = !current.cons.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                    let hasOffer = !current.offer.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                    let hasDemand = !current.demand.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                    //its ok if its empty
+                    let hasIn5Months = !current.in5Months.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                    
+                    
+                    // If one of the basic boxes is empty → it does not move
+                    guard hasPros, hasCons, hasOffer, hasDemand else {
+                        print("🚨 يجب تعبئة جميع الخانات (ما عدا 5 Months يمكن تركها فارغة)")
+                        return
+                    }
+                    
+                    //Transfer is allowed whether in5Months is empty or not
                     if !viewModel.goToNextOption() {
-                        // ✅ last option finished → decide where to go
                         if viewModel.options.count == 1 {
-                            goToHeart = true   // go heart if only 1 option
+                            goToHeart = true
                         } else {
                             goToDecisionPageView = true
                         }
@@ -166,6 +188,20 @@ struct DecisionPage: View {
                 }
                 .font(.system(size: 18, weight: .medium, design: .rounded))
                 .foregroundColor(Color("red"))
+
+//                Button("Next") {
+//                    if !viewModel.goToNextOption() {
+//                        // ✅ last option finished → decide where to go
+//                        if viewModel.options.count == 1 {
+//                            goToHeart = true   // go heart if only 1 option
+//                        } else {
+//                            goToDecisionPageView = true
+//                        }
+//                    }
+//                    withAnimation { expandedCard = nil }
+//                }
+//                .font(.system(size: 18, weight: .medium, design: .rounded))
+//                .foregroundColor(Color("red"))
             }
         }
     }
