@@ -6,13 +6,14 @@ struct DecisionPageView: View {
     @State private var currentQuestionIndex = 0
     @State private var goToCompletion = false   // ✅ new navigation flag
 
-    let questions = [
-        "What do you prefer?",
-        "What can you tolerate?",
-        "Which will you take?",
-        "What demand can you meet?",
-        "In 5 months?",
-        "In 5 years?"
+    // كل سؤال مربوط بالـ keyPath تبعه
+    let questions: [(title: String, keyPath: KeyPath<OptionDetail, String>)] = [
+        ("What do you prefer?", \.pros),
+        ("What can you tolerate?", \.cons),
+        ("Which will you take?", \.offer),
+        ("What demand can you meet?", \.demand),
+        ("In 5 months?", \.in5Months),
+        ("In 5 years?", \.in5Years)
     ]
 
     var body: some View {
@@ -28,41 +29,32 @@ struct DecisionPageView: View {
             )
             .ignoresSafeArea()
 
-            
-           
             VStack(spacing: 40) {
-                
                 Spacer().frame(height: 30)
 
                 // Question title
-                Text(questions[currentQuestionIndex])
-                    .font(.system(size: 25.8, weight: .bold, design: .rounded))
+                Text(questions[currentQuestionIndex].title)
+                    .font(.system(size: 26, weight: .bold, design: .rounded))
                     .foregroundColor(Color("red"))
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 10)
-                Spacer().frame(height: 40)
-                
-                
-                
-                
+
                 ZStack {
-                    //Spacer()
-                    Spacer().frame(height: 300)
-                
                     // OR text in background
                     Text("OR")
                         .font(.system(size: 90, weight: .bold))
                         .foregroundColor(Color("red"))
                         .shadow(color: Color.black.opacity(0.25), radius: 4, x: 2, y: 2)
-                        .opacity(0.9)
+                        .opacity(0.15)
                         .offset(x: -140, y: 20)
 
                     VStack(spacing: 25) {
                         ForEach(0..<viewModel.options.count, id: \.self) { idx in
+                            let detail = viewModel.details[idx]
+                            let answer = detail[keyPath: questions[currentQuestionIndex].keyPath]
+
                             OptionBox(
-                                text: viewModel.details.indices.contains(idx) ?
-                                      viewModel.details[idx].label :
-                                      "Option \(idx+1)",
+                                text: !answer.isEmpty ? answer : detail.label,
                                 color: Color("red"),
                                 isSelected: selectedOption == idx
                             )
@@ -79,14 +71,14 @@ struct DecisionPageView: View {
                 }
 
                 Spacer()
-              
             }
             .padding()
 
             // ✅ NavigationLink to CompletionView
-            NavigationLink(destination: CompletionView()
-                .environmentObject(viewModel),
-                isActive: $goToCompletion) {
+            NavigationLink(
+                destination: CompletionView().environmentObject(viewModel),
+                isActive: $goToCompletion
+            ) {
                 EmptyView()
             }
             .hidden()
@@ -94,9 +86,6 @@ struct DecisionPageView: View {
         .navigationBarBackButtonHidden(true)
     }
 
-    
-    
-    
     private func autoAdvance() {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             withAnimation(.easeInOut) {
@@ -147,8 +136,3 @@ struct OptionBox: View {
             .environmentObject(OptionsViewModel())
     }
 }
-
-
-
-
-
