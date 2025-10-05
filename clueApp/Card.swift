@@ -201,17 +201,17 @@ struct CardTextFieldView: View {
             editorBinding($text, placeholder: "List all the pros that you can think of", bold: true)
 
         case "Cons":
-            editorBinding($text, placeholder: "List all the cons that you can think of")
+            editorBinding($text, placeholder: "List all the cons that you can think of", bold: true)
 
         case "Offer and demand":
             HStack(alignment: .top, spacing: 20) {
-                editorBinding($text,       placeholder: "What does it\noffer you", width: 153, height: 113)
-                editorBinding($secondText, placeholder: "What does\ndemand from\nyou", width: 153, height: 113)
+                editorBinding($text,       placeholder: "What does it\noffer you", width: 153, height: 113, bold: true)
+                editorBinding($secondText, placeholder: "What does\ndemand from\nyou", width: 153, height: 113, bold: true)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
 
         case "In 5 Months":
-            editorBinding($text, placeholder: "With this choice\nWhat do you see in 5 months ")
+            editorBinding($text, placeholder: "With this choice\nWhat do you see in 5 months ", bold: true)
 
         case "In 5 Years":
             editorBinding($text, placeholder: "With this choice\nWhat do you see in 5 years ", bold: true)
