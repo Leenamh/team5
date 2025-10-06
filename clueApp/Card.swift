@@ -17,15 +17,23 @@ struct Card: View {
 // MARK: - Decision Page Layout
 struct DecisionPage: View {
     @EnvironmentObject var viewModel: OptionsViewModel
+
+    // Shared focus state
+    @FocusState private var focusedField: FocusField?
+
+    enum FocusField: Hashable {
+        case pros, cons, offer, demand, months, years
+    }
+
     @State private var expandedCard: String? = nil
     @State private var goToDecisionPageView = false
-    @State private var goToHeart = false   // ✅ new flag
+    @State private var goToHeart = false
 
     var body: some View {
         ZStack {
             Color("BG").ignoresSafeArea()
 
-            // fixed header + label
+            // Header + label
             VStack {
                 HStack {
                     Text("Option \(viewModel.currentIndex + 1)")
@@ -41,7 +49,6 @@ struct DecisionPage: View {
                 }
                 .padding(.horizontal)
 
-                // label from the selected option
                 if viewModel.details.indices.contains(viewModel.currentIndex) {
                     Text(viewModel.details[viewModel.currentIndex].label)
                         .font(.system(size: 25, weight: .bold))
@@ -53,130 +60,189 @@ struct DecisionPage: View {
                 Spacer()
             }
 
-            // cards stack
+            // Cards list
             VStack {
                 Spacer()
                 VStack(spacing: -40) {
-                    ForEach(["Pros", "Cons", "Offer and demand", "In 5 Months", "In 5 Years"], id: \.self) { title in
-                        CurvedCard(
-                            text: title,
-                            color: getColor(for: title),
-                            isExpanded: expandedCard == title
-                        ) {
-                            withAnimation(.easeInOut(duration: 0.3)) {
-                                expandedCard = (expandedCard == title) ? nil : title
-                            }
+
+                    // Pros
+                    CurvedCard(
+                        text: "Pros",
+                        color: getColor(for: "Pros"),
+                        isExpanded: expandedCard == "Pros"
+                    ) {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            expandedCard = (expandedCard == "Pros") ? nil : "Pros"
                         }
-                        .overlay(
-                            Group {
-                                if expandedCard == title,
-                                   viewModel.details.indices.contains(viewModel.currentIndex) {
-
-                                    let idx = viewModel.currentIndex
-
-                                    switch title {
-                                    case "Pros":
-                                        CardTextFieldView(
-                                            title: title,
-                                            text: Binding(
-                                                get: { viewModel.details[idx].pros },
-                                                set: { viewModel.details[idx].pros = $0 }
-                                            )
-                                        )
-
-                                    case "Cons":
-                                        CardTextFieldView(
-                                            title: title,
-                                            text: Binding(
-                                                get: { viewModel.details[idx].cons },
-                                                set: { viewModel.details[idx].cons = $0 }
-                                            )
-                                        )
-
-                                    case "Offer and demand":
-                                        CardTextFieldView(
-                                            title: title,
-                                            text: Binding(
-                                                get: { viewModel.details[idx].offer },
-                                                set: { viewModel.details[idx].offer = $0 }
-                                            ),
-                                            secondText: Binding(
-                                                get: { viewModel.details[idx].demand },
-                                                set: { viewModel.details[idx].demand = $0 }
-                                            )
-                                        )
-
-                                    case "In 5 Months":
-                                        CardTextFieldView(
-                                            title: title,
-                                            text: Binding(
-                                                get: { viewModel.details[idx].in5Months },
-                                                set: { viewModel.details[idx].in5Months = $0 }
-                                            )
-                                        )
-
-                                    case "In 5 Years":
-                                        CardTextFieldView(
-                                            title: title,
-                                            text: Binding(
-                                                get: { viewModel.details[idx].in5Years },
-                                                set: { viewModel.details[idx].in5Years = $0 }
-                                            )
-                                        )
-
-                                    default:
-                                        EmptyView()
-                                    }
-                                }
-                            },
-                            alignment: .center
-                        )
                     }
+                    .overlay(
+                        Group {
+                            if expandedCard == "Pros", viewModel.details.indices.contains(viewModel.currentIndex) {
+                                let idx = viewModel.currentIndex
+                                CardTextFieldView(
+                                    title: "Pros",
+                                    text: Binding(
+                                        get: { viewModel.details[idx].pros },
+                                        set: { viewModel.details[idx].pros = $0 }
+                                    ),
+                                    focusedField: $focusedField,
+                                    currentField: .pros,
+                                    nextField: .cons,
+                                    onFocusChange: expandForFocus
+                                )
+                            }
+                        },
+                        alignment: .center
+                    )
+
+                    // Cons
+                    CurvedCard(
+                        text: "Cons",
+                        color: getColor(for: "Cons"),
+                        isExpanded: expandedCard == "Cons"
+                    ) {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            expandedCard = (expandedCard == "Cons") ? nil : "Cons"
+                        }
+                    }
+                    .overlay(
+                        Group {
+                            if expandedCard == "Cons", viewModel.details.indices.contains(viewModel.currentIndex) {
+                                let idx = viewModel.currentIndex
+                                CardTextFieldView(
+                                    title: "Cons",
+                                    text: Binding(
+                                        get: { viewModel.details[idx].cons },
+                                        set: { viewModel.details[idx].cons = $0 }
+                                    ),
+                                    focusedField: $focusedField,
+                                    currentField: .cons,
+                                    nextField: .offer,
+                                    onFocusChange: expandForFocus
+                                )
+                            }
+                        },
+                        alignment: .center
+                    )
+
+                    // Offer and demand
+                    CurvedCard(
+                        text: "Offer and demand",
+                        color: getColor(for: "Offer and demand"),
+                        isExpanded: expandedCard == "Offer and demand"
+                    ) {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            expandedCard = (expandedCard == "Offer and demand") ? nil : "Offer and demand"
+                        }
+                    }
+                    .overlay(
+                        Group {
+                            if expandedCard == "Offer and demand", viewModel.details.indices.contains(viewModel.currentIndex) {
+                                let idx = viewModel.currentIndex
+                                CardTextFieldView(
+                                    title: "Offer and demand",
+                                    text: Binding(
+                                        get: { viewModel.details[idx].offer },
+                                        set: { viewModel.details[idx].offer = $0 }
+                                    ),
+                                    secondText: Binding(
+                                        get: { viewModel.details[idx].demand },
+                                        set: { viewModel.details[idx].demand = $0 }
+                                    ),
+                                    focusedField: $focusedField,
+                                    currentField: .offer,
+                                    nextField: .months,
+                                    onFocusChange: expandForFocus
+                                )
+                            }
+                        },
+                        alignment: .center
+                    )
+
+                    // In 5 Months
+                    CurvedCard(
+                        text: "In 5 Months",
+                        color: getColor(for: "In 5 Months"),
+                        isExpanded: expandedCard == "In 5 Months"
+                    ) {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            expandedCard = (expandedCard == "In 5 Months") ? nil : "In 5 Months"
+                        }
+                    }
+                    .overlay(
+                        Group {
+                            if expandedCard == "In 5 Months", viewModel.details.indices.contains(viewModel.currentIndex) {
+                                let idx = viewModel.currentIndex
+                                CardTextFieldView(
+                                    title: "In 5 Months",
+                                    text: Binding(
+                                        get: { viewModel.details[idx].in5Months },
+                                        set: { viewModel.details[idx].in5Months = $0 }
+                                    ),
+                                    focusedField: $focusedField,
+                                    currentField: .months,
+                                    nextField: .years,
+                                    onFocusChange: expandForFocus
+                                )
+                            }
+                        },
+                        alignment: .center
+                    )
+
+                    // In 5 Years
+                    CurvedCard(
+                        text: "In 5 Years",
+                        color: getColor(for: "In 5 Years"),
+                        isExpanded: expandedCard == "In 5 Years"
+                    ) {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            expandedCard = (expandedCard == "In 5 Years") ? nil : "In 5 Years"
+                        }
+                    }
+                    .overlay(
+                        Group {
+                            if expandedCard == "In 5 Years", viewModel.details.indices.contains(viewModel.currentIndex) {
+                                let idx = viewModel.currentIndex
+                                CardTextFieldView(
+                                    title: "In 5 Years",
+                                    text: Binding(
+                                        get: { viewModel.details[idx].in5Years },
+                                        set: { viewModel.details[idx].in5Years = $0 }
+                                    ),
+                                    focusedField: $focusedField,
+                                    currentField: .years,
+                                    nextField: nil,
+                                    onFocusChange: expandForFocus
+                                )
+                            }
+                        },
+                        alignment: .center
+                    )
                 }
                 .padding(.bottom, -30)
             }
 
-            // ✅ NavigationLink to DecisionPageView
-            NavigationLink(destination: DecisionPageView().environmentObject(viewModel),
-                           isActive: $goToDecisionPageView) {
-                EmptyView()
-            }
-            .hidden()
-
-            // ✅ NavigationLink to Heart page
-            NavigationLink(destination: heart().environmentObject(viewModel),
-                           isActive: $goToHeart) {
-                EmptyView()
-            }
-            .hidden()
+            // Navigation Links
+            NavigationLink(destination: DecisionPageView().environmentObject(viewModel), isActive: $goToDecisionPageView) { EmptyView() }.hidden()
+            NavigationLink(destination: heart().environmentObject(viewModel), isActive: $goToHeart) { EmptyView() }.hidden()
         }
         .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                
-                
-                
-                
                 Button("Next") {
                     guard viewModel.details.indices.contains(viewModel.currentIndex) else { return }
+
                     let current = viewModel.details[viewModel.currentIndex]
-                    
-                    // Check that the user entered at least the basic fields (without in5Months)
                     let hasPros = !current.pros.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
                     let hasCons = !current.cons.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
                     let hasOffer = !current.offer.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
                     let hasDemand = !current.demand.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-                    //its ok if its empty
-                    let hasIn5Months = !current.in5Months.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-                    
-                    
-                    // If one of the basic boxes is empty → it does not move
+
                     guard hasPros, hasCons, hasOffer, hasDemand else {
                         print("🚨 يجب تعبئة جميع الخانات (ما عدا 5 Months يمكن تركها فارغة)")
                         return
                     }
-                    
-                    //Transfer is allowed whether in5Months is empty or not
+
                     if !viewModel.goToNextOption() {
                         if viewModel.options.count == 1 {
                             goToHeart = true
@@ -184,24 +250,25 @@ struct DecisionPage: View {
                             goToDecisionPageView = true
                         }
                     }
+
                     withAnimation { expandedCard = nil }
                 }
                 .font(.system(size: 18, weight: .medium, design: .rounded))
                 .foregroundColor(Color("red"))
+            }
+        }
+    }
 
-//                Button("Next") {
-//                    if !viewModel.goToNextOption() {
-//                        // ✅ last option finished → decide where to go
-//                        if viewModel.options.count == 1 {
-//                            goToHeart = true   // go heart if only 1 option
-//                        } else {
-//                            goToDecisionPageView = true
-//                        }
-//                    }
-//                    withAnimation { expandedCard = nil }
-//                }
-//                .font(.system(size: 18, weight: .medium, design: .rounded))
-//                .foregroundColor(Color("red"))
+    // Expand appropriate card for a focus field
+    private func expandForFocus(_ field: FocusField?) {
+        guard let f = field else { return }
+        withAnimation {
+            switch f {
+            case .pros: expandedCard = "Pros"
+            case .cons: expandedCard = "Cons"
+            case .offer, .demand: expandedCard = "Offer and demand"
+            case .months: expandedCard = "In 5 Months"
+            case .years: expandedCard = "In 5 Years"
             }
         }
     }
@@ -218,53 +285,79 @@ struct DecisionPage: View {
     }
 }
 
-
-// MARK: - CardTextFieldView (new binding-based)
+// MARK: - CardTextFieldView (Fixed single Next button)
 struct CardTextFieldView: View {
     var title: String
     @Binding var text: String
     @Binding var secondText: String
+    let focusedField: FocusState<DecisionPage.FocusField?>.Binding
+    let currentField: DecisionPage.FocusField
+    let nextField: DecisionPage.FocusField?
+    let onFocusChange: (DecisionPage.FocusField?) -> Void
 
-    init(title: String, text: Binding<String>, secondText: Binding<String> = .constant("")) {
+    init(
+        title: String,
+        text: Binding<String>,
+        secondText: Binding<String> = .constant(""),
+        focusedField: FocusState<DecisionPage.FocusField?>.Binding,
+        currentField: DecisionPage.FocusField,
+        nextField: DecisionPage.FocusField?,
+        onFocusChange: @escaping (DecisionPage.FocusField?) -> Void
+    ) {
         self.title = title
         self._text = text
         self._secondText = secondText
+        self.focusedField = focusedField
+        self.currentField = currentField
+        self.nextField = nextField
+        self.onFocusChange = onFocusChange
     }
 
     var body: some View {
-        switch title {
-        case "Pros":
-            editorBinding($text, placeholder: "List all the pros that you can think of", bold: true)
+        VStack {
+            if title == "Offer and demand" {
+                HStack(alignment: .top, spacing: 20) {
+                    // Offer (بدون زر Next)
+                    singleEditor(
+                        text: $text,
+                        placeholder: "What does it\noffer you",
+                        field: .offer,
+                        nextTarget: nil, // ← ما له زر
+                        width: 153
+                    )
 
-        case "Cons":
-            editorBinding($text, placeholder: "List all the cons that you can think of", bold: true)
-
-        case "Offer and demand":
-            HStack(alignment: .top, spacing: 20) {
-                editorBinding($text,       placeholder: "What does it\noffer you", width: 153, height: 113, bold: true)
-                editorBinding($secondText, placeholder: "What does\ndemand from\nyou", width: 153, height: 113, bold: true)
+                    // Demand (مع زر Next)
+                    singleEditor(
+                        text: $secondText,
+                        placeholder: "What does it\ndemand from\nyou",
+                        field: .demand,
+                        nextTarget: nextField,
+                        width: 153
+                    )
+                }
+            } else {
+                singleEditor(
+                    text: $text,
+                    placeholder: getPlaceholder(for: title),
+                    field: currentField,
+                    nextTarget: nextField
+                )
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-
-        case "In 5 Months":
-            editorBinding($text, placeholder: "With this choice\nWhat do you see in 5 months ", bold: true)
-
-        case "In 5 Years":
-            editorBinding($text, placeholder: "With this choice\nWhat do you see in 5 years ", bold: true)
-
-        default:
-            EmptyView()
         }
     }
 
-    @ViewBuilder
-    private func editorBinding(_ value: Binding<String>,
-                               placeholder: String,
-                               width: CGFloat = 282,
-                               height: CGFloat = 152,
-                               bold: Bool = false) -> some View {
+    // MARK: - Single Editor
+    private func singleEditor(
+        text: Binding<String>,
+        placeholder: String,
+        field: DecisionPage.FocusField,
+        nextTarget: DecisionPage.FocusField?,
+        width: CGFloat = 282,
+        height: CGFloat = 152
+    ) -> some View {
         ZStack(alignment: .topLeading) {
-            TextEditor(text: value)
+            TextEditor(text: text)
+                .focused(focusedField, equals: field)
                 .scrollContentBackground(.hidden)
                 .autocorrectionDisabled()
                 .padding(.horizontal, 20)
@@ -277,17 +370,60 @@ struct CardTextFieldView: View {
                         .stroke(Color.white.opacity(0.3), lineWidth: 1)
                 )
                 .frame(width: width, height: height)
-                .multilineTextAlignment(.leading)
-                .font(.system(size: 16, weight: bold ? .bold : .regular))
+                .font(.system(size: 16, weight: .bold))
+                // Detect newline (Return key)
+                .onChange(of: text.wrappedValue) { newValue in
+                    if newValue.contains("\n") {
+                        text.wrappedValue = newValue.replacingOccurrences(of: "\n", with: "")
+                        DispatchQueue.main.async {
+                            if let next = nextTarget {
+                                focusedField.wrappedValue = next
+                                onFocusChange(next)
+                            } else {
+                                focusedField.wrappedValue = nil
+                                onFocusChange(nil)
+                            }
+                        }
+                    }
+                }
+                // ✅ Only show toolbar for fields that need it
+                .toolbar {
+                    ToolbarItemGroup(placement: .keyboard) {
+                        Spacer()
+                        if field != .offer { // ← اخفِ الزر في Offer فقط
+                            if let next = nextTarget {
+                                Button("Next") {
+                                    focusedField.wrappedValue = next
+                                    onFocusChange(next)
+                                }
+                            } else {
+                                Button("Done") {
+                                    focusedField.wrappedValue = nil
+                                    onFocusChange(nil)
+                                }
+                            }
+                        }
+                    }
+                }
 
-            if value.wrappedValue.isEmpty {
+            if text.wrappedValue.isEmpty {
                 Text(placeholder)
-                    .foregroundColor(Color.gray.opacity(0.8))
-                    .frame(maxWidth: width - 22, alignment: .leading)
-                    .padding(.top, 20)
+                    .foregroundColor(.white.opacity(0.7))
+                    .font(.system(size: 15, weight: .semibold))
+                    .padding(.top, 18)
                     .padding(.leading, 24)
                     .allowsHitTesting(false)
             }
+        }
+    }
+
+    private func getPlaceholder(for title: String) -> String {
+        switch title {
+        case "Pros": return "List all the pros that you can think of"
+        case "Cons": return "List all the cons that you can think of"
+        case "In 5 Months": return "With this choice,\nwhat do you see in 5 months?"
+        case "In 5 Years": return "With this choice,\nwhat do you see in 5 years?"
+        default: return ""
         }
     }
 }
@@ -296,7 +432,6 @@ struct CardTextFieldView: View {
 struct CurvedCard: View {
     var text: String
     var color: Color
-
     var isExpanded: Bool
     var onTap: () -> Void
 
@@ -336,6 +471,6 @@ struct OpenedCardShape: Shape {
         path.addQuadCurve(to: CGPoint(x: rect.width, y: -100), control: CGPoint(x: rect.width, y: 0))
         path.addLine(to: CGPoint(x: rect.width, y: rect.height))
         path.closeSubpath()
-        return path;
+        return path
     }
 }
