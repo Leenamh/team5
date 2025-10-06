@@ -31,10 +31,10 @@ struct OptionTitleView: View {
                         Capsule().stroke(Color.white.opacity(0.5), lineWidth: 1)
                     )
                     .frame(width: 282, height: 36)
+                    .disableAutocorrection(true)
+                    .tint(Color("red")) // 👈 لون البوينتر (cursor)
 
                 Spacer()
-
-                // Decorative stacked cards (like your old style)
                 condensedCards()
             }
             .padding()
@@ -42,17 +42,12 @@ struct OptionTitleView: View {
                 optionTitle = viewModel.titleForCurrent()
             }
 
-            // ✅ Navigate to Card
-            NavigationLink(destination: Card().environmentObject(viewModel), isActive: $goToDecisionPage) {
-                EmptyView()
-            }
-            .hidden()
+            // ✅ Navigation Links
+            NavigationLink(destination: Card().environmentObject(viewModel),
+                           isActive: $goToDecisionPage) { EmptyView() }.hidden()
 
-            // ✅ Navigate back to NumOtionsView
-            NavigationLink(destination: NumOtionsView().environmentObject(viewModel), isActive: $goToNumOptions) {
-                EmptyView()
-            }
-            .hidden()
+            NavigationLink(destination: NumOtionsView().environmentObject(viewModel),
+                           isActive: $goToNumOptions) { EmptyView() }.hidden()
         }
         .navigationBarBackButtonHidden(true)
         .toolbar {
@@ -75,9 +70,11 @@ struct OptionTitleView: View {
                 .font(.system(size: 18, weight: .medium, design: .rounded))
             }
         }
+        // 👇 يمنع تحريك الصفحة عند ظهور الكيبورد
+        .ignoresSafeArea(.keyboard, edges: .all)
     }
 
-    // ✅ Save logic + navigation
+    // MARK: - Save logic + navigation
     private func saveAndAdvance() {
         let trimmed = optionTitle.trimmingCharacters(in: .whitespacesAndNewlines)
         viewModel.updateCurrentTitle(trimmed)

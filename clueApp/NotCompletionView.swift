@@ -25,12 +25,13 @@ struct NotCompletionView: View {
             .ignoresSafeArea()
 
             VStack(spacing: 20) {
-                Spacer()
+                
 
-                Text(" An Invalid ")
-                    .font(.system(size: 60, weight: .bold, design: .rounded))
+                Text(" An Invalid Decion ")
+                    .font(.system(size: 40, weight: .bold, design: .rounded))
                     .foregroundColor(Color("red"))
                     .multilineTextAlignment(.center)
+
 
                 // ✅ Show winning option label
                 if let winner = viewModel.winningOption() {
@@ -38,10 +39,9 @@ struct NotCompletionView: View {
                         .font(.system(size: 28, weight: .medium, design: .rounded))
                         .foregroundColor(.black.opacity(0.7))
                         .multilineTextAlignment(.center)
-                        .padding(.horizontal)
+                        .padding(.horizontal).padding(.bottom, 210)
                 }
 
-                Spacer()
             }
 
             // ✅ Hidden NavigationLink back to Home

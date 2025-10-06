@@ -41,6 +41,7 @@ struct ShakePage1: View {
                         .font(.custom("AvenirNextRounded-Bold", size: 16))
                         .background(Color.clear)
                         .disableAutocorrection(true)
+                        .tint(Color("red")) // 👈 لون المؤشر (cursor)
                     }
                     .position(x: geo.size.width * 0.3, y:90)
 
@@ -67,6 +68,7 @@ struct ShakePage1: View {
                         .font(.custom("AvenirNextRounded-Bold", size: 16))
                         .background(Color.clear)
                         .disableAutocorrection(true)
+                        .tint(Color("red")) // 👈 لون المؤشر (cursor)
                     }
                     .position(x: geo.size.width * 0.7, y:90)
 
@@ -89,7 +91,7 @@ struct ShakePage1: View {
                         .resizable()
                         .scaledToFit()
                         .frame(width: 430, height: 430)
-                        .position(x: geo.size.width / 2, y: geo.size.height - 290)
+                        .position(x: geo.size.width / 2, y: geo.size.height - 250)
                 }
             }
         }

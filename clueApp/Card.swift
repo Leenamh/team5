@@ -39,19 +39,19 @@ struct DecisionPage: View {
                     Text("Option \(viewModel.currentIndex + 1)")
                         .font(.headline)
                         .foregroundColor(.white)
-                        .padding(.vertical, 40)
+                        .padding(.vertical, 20)
                         .padding(.horizontal, 30)
                         .background(Color(red: 1.0, green: 0.831, blue: 0.541))
-                        .cornerRadius(28)
+                        .cornerRadius(20)
                         .padding(.leading, -35)
-                        .offset(x: 4, y: -100)
+                        .offset(x: 4, y: -55)
                     Spacer()
                 }
                 .padding(.horizontal)
 
                 if viewModel.details.indices.contains(viewModel.currentIndex) {
                     Text(viewModel.details[viewModel.currentIndex].label)
-                        .font(.system(size: 25, weight: .bold))
+                        .font(.system(size: 35, weight: .bold))
                         .foregroundColor(.red)
                         .multilineTextAlignment(.center)
                         .padding(.top, -10)
@@ -365,6 +365,7 @@ struct CardTextFieldView: View {
                 .background(Color.white.opacity(0.4))
                 .clipShape(RoundedRectangle(cornerRadius: 20))
                 .foregroundColor(.gray)
+                .tint(Color("red")) // 👈 لون البوينتر (cursor)
                 .overlay(
                     RoundedRectangle(cornerRadius: 20)
                         .stroke(Color.white.opacity(0.3), lineWidth: 1)
@@ -419,8 +420,8 @@ struct CardTextFieldView: View {
 
     private func getPlaceholder(for title: String) -> String {
         switch title {
-        case "Pros": return "List all the pros that you can think of"
-        case "Cons": return "List all the cons that you can think of"
+        case "Pros": return "List all the pros that you can \n think of"
+        case "Cons": return "List all the cons that you can \n think of"
         case "In 5 Months": return "With this choice,\nwhat do you see in 5 months?"
         case "In 5 Years": return "With this choice,\nwhat do you see in 5 years?"
         default: return ""
